@@ -37,3 +37,7 @@ It is possible to see the subtitles in real time (delay minus 1 second), in any 
 ## Download 📌
 
 [V 1.0](https://github.com/JeanCaro/Babelin/releases).
+
+## Online
+
+* [Babelin Online](https://5fab276ad221eb320f2c693e--condescending-perlman-4a4082.netlify.app/)
