@@ -39,6 +39,6 @@ It is possible to see the subtitles in real time (delay minus 1 second), in any 
 
 ## Online
 
-* [Babelin Online](https://5fab276ad221eb320f2c693e--condescending-perlman-4a4082.netlify.app/)
+* [Babelin Online](https://jeancaro.github.io/)
 
 # All audio is sent to google/cloud servers for processing.
