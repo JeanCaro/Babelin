@@ -39,6 +39,6 @@ It is possible to see the subtitles in real time (delay minus 1 second), in any 
 
 ## Online
 
-* [Babelin Online](https://jeancaro.github.io/)
+* [Babelin Online](https://jeancaro.github.io/Babelin/BabelinSpeech.html)
 
 # All audio is sent to google/cloud servers for processing.
