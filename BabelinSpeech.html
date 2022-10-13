@@ -1,966 +1,1307 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<script>
-	var INDEXLANGUAGE = 0;//CHANGE YOUR LANGUAGE PREFERRED
-	var SEPARATION=700;
-	var FIX=500;
-</script>
-<meta charset="utf-8">
-<title class="skiptranslate">Babelin Speech 1.0 / Speech Recording with Web Speech API</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,=">
-<style>
-html, body{ 
-	height: 100%;
-	font-family: Arial, Helvetica, sans-serif;
-}
-h2{text-transform: uppercase;}
-.divHidden,.divTop,.divBottom,.divControlSpeech{
-	  width: 100%;
-}
-.divHelp{
-	  position: fixed;
-	  right: 0;
-	  font-size:250%;
-	  border: 1px solid gray;
-	  background-color: slategrey;
-	  z-index:1;
-	  cursor: pointer;
-}
-.divTop{
-	  position: fixed;
-	  border: none;
-	  background-color: white;
-}
-.divHidden, .divTop{
-	  height: 50%;
-}
-.divBottom{
-	  height: auto;
-	  border: 1px solid red;
-}
-.divControlSpeech{
-	border:none;
-	height:65px;
-}
-.divControlsSubs{
-	height:65px;
-	border-bottom: 1px solid black;
-}
-.divVideo, .divTranscript{
-	height:calc(100% - 145px)
-}
-.divVideo{
-	background:black;border:1px solid green;
-	display:inline-block;
-	width:55%;
-	opacity:100%;
-}
-.divTranscript{
-	overflow: auto;
-	vertical-align:top;
-	display:inline-block;
-	border:1px solid green;
-	width:43%;
-}
-video::cue{
-	background: rgba(1, 1, 1, 0);
-	text-shadow: -1px -1px 0 #000000,1px -1px 0 #000000,-1px 1px 0 #000000,1px 1px 0 #000000;
-}
-::cue(.recordRed) {
-	color: red;
-	font-size:120%;
-} 
-::cue(.recordWhite) {
-	color: white;
-	font-size:120%;
-}
-::cue(.countS) {
-	font-size:70%;
-} 
-::cue(i) {
-	font-size:60%;
-}
-select, label, button, .divControlsEdit div{
-  border: none;
-  color: white;
-  padding: 0px 0px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 100%;
-  margin: 0px 0px;
-  background-color: slategrey;
-  vertical-align:top;
-}
-#editAll{
-	color: blue;
-	cursor: pointer;
-	text-decoration: underline;
-	display:none;
-}
-.divControlsEdit{
-	position:fixed;
-	top:58px;
-	right:20px;
-}
-.divControlsEdit div{
-	cursor: pointer;
-}
-#idCountCharacters{
-	background:black;
-	color:white;
-	position: sticky;
-	top:0px;
-	right:0px;
-}
-#idCountCharacters[data-diff="true"]{
-	background:red;
-}
-#idTranscript:hover~#idCountCharacters{
-	display:none;
-}
-#idLabelSubtitle,#idButtonRecognition,#idLabelVideo,
-#idSelectLanguage,#idSelectDialect,#idCaptions{
-	height:25px;
-	width:30%;
-	font-size: 100%;
-	cursor: pointer;
-}
-button{
-	cursor: pointer;
-}
-#idButtonDown,#idButtonUp{
-	font-size:150%;
-}
-#idGroup1,#idGroup2,#idGroup3,#idGroup4 {
-  margin: 5px;
-} 
-input {
-	border: none;
-	text-align: left;
-	padding: 0px 0px;
-	display: inline-block;
-	font-size: 100%;
-	transition-duration: 0.4s;
-	height:100%;
-}
-.inputGroup
-{
-	border: 1px solid black;
-	width:30%;
-	display:inline-block;
-	vertical-align:text-bottom;
-}
-.DowloadSubtitle
-{
-	width:auto;
-	visibility:hidden;
-}
-.visually-hidden {
-  position: absolute !important;
-  height: 1px;
-  width: 1px;
-  overflow: hidden;
-  clip: rect(1px, 1px, 1px, 1px);
-}
-input.visually-hidden:focus + label {
-  outline: thin dotted;
-}
-input.visually-hidden:focus-within + label {
-  outline: thin dotted;
-}
-.idModal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-.idModal-content {
-  position: relative;
-  background-color: #fefefe;
-  margin: auto;
-  padding: 0;
-  border: 1px solid #888;
-  width: 80%;
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-  -webkit-animation-name: animatetop;
-  -webkit-animation-duration: 0.4s;
-  animation-name: animatetop;
-  animation-duration: 0.4s
-}
-@-webkit-keyframes animatetop {
-  from {top:-300px; opacity:0} 
-  to {top:0; opacity:1}
-}
-@keyframes animatetop {
-  from {top:-300px; opacity:0}
-  to {top:0; opacity:1}
-}
-.close {
-  color: white;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-.close:hover,.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
-.idModal-header {
-  padding: 2px 16px;
-  background-color: slategrey;
-  color: white;
-}
-.idModal-body {padding: 2px 16px;}
-.idModal-footer {
-  padding: 2px 16px;
-  background-color: slategrey;
-  color: white;
-}
-ol {  padding: 0px;}
-ol li {  margin-left: 40px;}
-</style>
-</head>
-<body onkeydown="keyEvent(event)" >
-<div class="skiptranslate"> 
-<div id="idHelp" class="divHelp" title="" onclick="idFrame.src=vyt;idModal.style.display = 'block'">?</div>
-</div>
-<div class="divTop">
-<div class="divControlSpeech skiptranslate" id="idControlsUP" >
-	<div id="idGroup1">
-		<input type="file" id="idFileVideo" name="File Video" accept="video/*,.mkv,audio/*" class="visually-hidden">
-		<label for="idFileVideo" id="idLabelVideo" title="You can drag and drop the video on this page or select the video file.">Load Video</label>
-		<select id="idSelectLanguage" onchange="updateCountry()" title="Select the language of the video. You can set the default language that is loaded by modifying line 5 of this file"></select>&nbsp;&nbsp; <select id="idSelectDialect"></select>
-	</div>
-	
-	<div id="idGroup2">
-		<button id="idButtonRecognition" type="button" onclick="startStopRecognition()" title="Start/stop video recognition speech. Ctrl + Q"/>Start Recognition</button>
-		<div class="inputGroup" title="If the silence between sentences exceeds this time, a new line is created for the subtitle">
-		<label>Separation (ms): </label>
-		<input type="number" id="idDistanceSentences" value=0 min="0" max="3000">
-		</div>
-		<div class="inputGroup" title="Fix delay Recognition in milliseconds (0-2000). There is a time delay between when you start speaking and the time the program recognizes the word. Here you can make the correction of the times of the generated subtitles.">
-		<label>Fix(ms): </label>
-		<input type="number" id="idDelayRecognition" value=0 min="0" max="2000">
-		</div>
-		</div>
-</div>
-<div class="divVideo skiptranslate">
-	<video id= "idVideo" width="100%" height="100%" controls>
-	  <source src="" onerror="" type="video/mp4">
-	  <track kind="subtitles" id="idFileVTT" label="File">
-	</video>
-</div>
-<div class="divTranscript">
-<div id="idCountCharacters" data-diff="false"></div>
-<div id="idTranscript" > </div>
-<div class="divControlsEdit" id="idControlEdit" style="display:none"> 
-<a href="http://www.deepl.com" target="_blank">DeepL</a>
-<a href="http://translate.yandex.com" target="_blank">Yandex</a>
-<a href="http://www.bing.com/translator" target="_blank">Bing</a>
-<a href="http://translate.google.com/" target="_blank">Google</a>
-<div onclick='cBusy(); setTimeout("updateTable()", 500) ' title="Updates the table with the text line by line, if the lines are different, it does not update the table.">Update</div>
-<div onclick="closeEdit()" title="Returns to the previous mode. The data in the table is not modified.">Close</div>
-</div>
-</div>
+<html lang="auto">
+    <head>
+        <script>
+            var INDEXLANGUAGE = 0;
+            //CHANGE YOUR LANGUAGE PREFERRED
+            var SEPARATION = 700;
+            var FIX = 500;
+        </script>
+        <meta charset="utf-8">
+        <title class="skiptranslate">Babelin Speech 1.1 / Speech Recording with Web Speech API</title>
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,=">
+        <style>
+            html, body {
+                height: 100%;
+                font-family: Arial, Helvetica, sans-serif;
+            }
 
-<div id="idControlsSubs" class="divControlsSubs skiptranslate">
-	<div id="idGroup3">
-	<select id="idCaptions" title="Select subtitles/captions for the video. File: Subtitle loaded from a file. Raw: It is the transcript of the video. Translations: This is the one that should be used to upload the translations. Real-Time: it is only used when the recognition is performed in real time.">
-	  <option value="File">File</option>
-	  <option value="Raw">Raw</option>
-	  <option value="Translation">Translation</option>
-	  <option value="RealTime">RealTime</option>
-	</select>
-	<input type="file" id="idFileSubtitle" name="File Subtitle" accept=".ass,.vtt,.srt" class="visually-hidden">
-	<label title=" Load subtitles (ass,vtt, srt) for video" for="idFileSubtitle" id="idLabelSubtitle">Load Subtitle</label>
-	</div>
-	<div id="idGroup4">
-	<button id="idButtonDown" type="button" title="Creates a table based on the video's subtitles (File, Raw, Translation), that is, subtitles loaded by voice recognition or by opening a subtitle file">⇩⇩⇩⇩⇩⇩</button>
-	<button id="idButtonUp" type="button" onclick="tableToSubtitle(currentTrack)" title="The table is uploaded to the specified subtitle of the video (File, Raw, Translation). And it also allows you to download the subtitle in three types (ass, srt, vtt)">⇧⇧⇧⇨⇨⇨</button>
-	<div id="idDownloadSubtiles" class="inputGroup DowloadSubtitle"	 >
-		<b id="idLabelDownload">Download Subtitles (Translation):</b> 
-			<a id="idVTT" href="">.vtt</a>
-			<a id="idSRT" href="">.srt</a>
-			<a id="idASS" href="">.ass</a>
-		</div>
-	</div>
-</div>
-</div>
-<div class="divHidden" id="idWatchTranslation"> - </div>
-<ol>
-<div class="divBottom">
-	<table border="1" cellpadding="5" id ="idTable" border="0">
-	<thead>
-	<tr class="skiptranslate">
-	<th>#</th>
-	<th><strong>Start</strong></th>
-	<th>End</th>
-	<th>Setting</th>
-	<th> <img id="idRecycleBin"></th>
-	<th>Text <span id="editAll" onclick="editTable()" title="Allows you to edit only the text, it is useful when you want to use other translation options, such as: www.deepl.com, www.bing.com/translator, translate.yandex.com/">(Edit All)</span></th>
-	</tr>
-	</thead>
-	</table>
-</div>
-</ol>
-<div id="idModal" class="idModal skiptranslate">
-  <div class="idModal-content">
-	<div class="idModal-header">
-	  <span class="close">&times;</span>
-	  <h2>Babelin Speech For voice recognition and real-time translation</h2>
-	</div>
-	<div class="idModal-body">
-	  <p>It uses the recognition and translation services offered by web browsers, which in this case is Chrome.
-For this, it is only necessary to change the microphone <a href="https://www.youtube.com/watch?v=Bd3moKLV5sE" target="_blank"> input to Stereo Mix.</a> </p>
-<iframe id="idFrame" width="420" height="315" src="">
-</iframe>
-<h3>Tips:</h3> <li>In local mode, permission will always be asked to access the microphone for safety. If a web server is running, it will only ask for permission once.
-<a href="https://www.python.org/downloads/" target="_blank"> Python </a> (python.exe -m http.server 8000 --bind 127.0.0.1), or <a href="https://www.voidtools.com/support/everything/http/" target="_blank"> Everthing </a> can be used as web servers.
-</li><li>Sometimes it is better to stop the recognition, for each person speaking.</li><li>Use shortcuts in full screen</li><h4>Known Issues.</h4> <li>After a few seconds of silence, the automatic recognition stops. </li><li>Sometimes it stops recognizing the voice after a period of time, stop and start</li>
-	</div>
-	<div class="idModal-footer"><h4>Is open source - FREE</h4></div>
-  </div>
-</div>
+            h2 {
+                text-transform: uppercase;
+            }
+
+            .divHidden, .divTop, .divBottom, .divControlSpeech {
+                width: 100%;
+            }
+
+            .divHelp {
+                position: fixed;
+                right: 0;
+                font-size: 250%;
+                border: 1px solid gray;
+                background-color: slategrey;
+                z-index: 1;
+                cursor: pointer;
+            }
+
+            .divTop {
+                position: fixed;
+                border: none;
+                background-color: white;
+            }
+
+            .divHidden, .divTop {
+                height: 50%;
+            }
+
+            .divBottom {
+                height: auto;
+                border: 1px solid red;
+            }
+
+            .divControlSpeech {
+                border: none;
+                height: 65px;
+            }
+
+            .divControlsSubs {
+                height: 65px;
+                border-bottom: 1px solid black;
+            }
+
+            .divVideo, .divTranscript {
+                height: calc(100% - 145px)
+            }
+
+            .divVideo {
+                background: black;
+                display: inline-block;
+                width: 55%;
+                opacity: 100%;
+                position: relative;
+            }
+
+            .divTranscript {
+                overflow: auto;
+                vertical-align: top;
+                display: inline-block;
+                border: 1px solid green;
+                width: 43%;
+            }
+
+            video::cue {
+                background: rgba(1, 1, 1, 0);
+                text-shadow: -1px -1px 0 #000000,1px -1px 0 #000000,-1px 1px 0 #000000,1px 1px 0 #000000;
+            }
+
+            ::cue(.recordRed) {
+                color: red;
+                font-size: 120%;
+            }
+
+            ::cue(.recordWhite) {
+                color: white;
+                font-size: 120%;
+            }
+
+            ::cue(.textGreen) {
+                color: lawngreen;
+            }
+
+            ::cue(.textWhite) {
+                color: white;
+            }
+
+            ::cue(.countS) {
+                font-size: 70%;
+            }
+
+            ::cue(i) {
+                font-size: 60%;
+            }
+
+            select, label, button, .divControlsEdit div {
+                border: none;
+                color: white;
+                padding: 0px 0px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 100%;
+                margin: 0px 0px;
+                background-color: #717171;
+                vertical-align: bottom;
+                height: 25px;
+                padding-right: 10px;
+                padding-left: 10px;
+            }
+
+            #editAll {
+                color: blue;
+                cursor: pointer;
+                text-decoration: underline;
+                display: none;
+            }
+
+            .divControlsEdit {
+                position: fixed;
+                top: 58px;
+                right: 20px;
+            }
+
+            .divControlsEdit div {
+                cursor: pointer;
+            }
+
+            #idCountCharacters {
+                background: black;
+                color: white;
+                position: sticky;
+                top: 0px;
+                right: 0px;
+            }
+
+            #idCountCharacters[data-diff="true"] {
+                background: red;
+            }
+
+            #idTranscript:hover~#idCountCharacters {
+                display: none;
+            }
+
+            #idLabelSubtitle,#idButtonRecognition,#idLabelVideo, #idSelectLanguage,#idSelectDialect,#idCaptions {
+                height: 25px;
+                width: 30%;
+                font-size: 100%;
+                cursor: pointer;
+            }
+
+            button {
+                cursor: pointer;
+            }
+
+            #idButtonDown,#idButtonUp,#idDownloadTable,#idDownloadTrack {
+                font-size: 100%;
+            }
+
+            #idGroup1,#idGroup2,#idGroup3,#idGroup4 {
+                margin: 5px;
+            }
+
+            input {
+                border: none;
+                text-align: left;
+                padding: 0px 0px;
+                display: inline-block;
+                font-size: 100%;
+                transition-duration: 0.4s;
+                /*height:100%;*/
+            }
+
+            .inputGroup {
+                border: 1px solid black;
+                display: inline-block;
+                vertical-align: text-bottom;
+            }
+
+            .DowloadSubtitle {
+                width: auto;
+                visibility: hidden;
+            }
+
+            .visually-hidden {
+                position: absolute !important;
+                height: 1px;
+                width: 1px;
+                overflow: hidden;
+                clip: rect(1px, 1px, 1px, 1px);
+            }
+
+            input.visually-hidden:focus + label {
+                outline: thin dotted;
+            }
+
+            input.visually-hidden:focus-within + label {
+                outline: thin dotted;
+            }
+
+            .idModal {
+                display: none;/* Hidden by default */
+                position: fixed;/* Stay in place */
+                z-index: 1;   /* Sit on top */
+                padding-top: 100px; /* Location of the box */
+                left: 0;
+                top: 0;
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                overflow: auto; /* Enable scroll if needed */
+                background-color: rgb(0,0,0); /* Fallback color */
+                background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            }
+
+            .idModal-content {
+                position: relative;
+                background-color: #fefefe;
+                margin: auto;
+                padding: 0;
+                border: 1px solid #888;
+                width: 80%;
+                box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+                -webkit-animation-name: animatetop;
+                -webkit-animation-duration: 0.4s;
+                animation-name: animatetop;
+                animation-duration: 0.4s
+            }
+
+            @-webkit-keyframes animatetop {
+                from {
+                    top: -300px;
+                    opacity: 0
+                }
+
+                to {
+                    top: 0;
+                    opacity: 1
+                }
+            }
+
+            @keyframes animatetop {
+                from {
+                    top: -300px;
+                    opacity: 0
+                }
+
+                to {
+                    top: 0;
+                    opacity: 1
+                }
+            }
+
+            .close {
+                color: white;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+            }
+
+            .close:hover,.close:focus {
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            .idModal-header {
+                padding: 2px 16px;
+                background-color: slategrey;
+                color: white;
+            }
+
+            .idModal-body {
+                padding: 2px 16px;
+            }
+
+            .idModal-footer {
+                padding: 2px 16px;
+                background-color: slategrey;
+                color: white;
+            }
+
+            ol {
+                padding: 0px;
+            }
+
+            ol li {
+                margin-left: 40px;
+            }
+        </style>
+    </head>
+    <body onkeydown="keyEvent(event)" onpaste="pasteURLVideo(event)">
+        <div class="skiptranslate">
+            <div id="idHelp" class="divHelp" title="" onclick="idFrame.src=vyt;idModal.style.display = 'block'">?</div>
+        </div>
+        <div class="divTop">
+            <div class="divControlSpeech skiptranslate" id="idControlsUP">
+                <div id="idGroup1">
+                    <input type="file" id="idFileVideo" name="File Video" accept="video/*,.mkv,audio/*" class="visually-hidden">
+                    <label for="idFileVideo" id="idLabelVideo" title="You can drag and drop the video on this page or select the video file.">Load Video</label>
+                    <select id="idSelectLanguage" onchange="updateCountry()" title="Select the language of the video. You can set the default language that is loaded by modifying line 5 of this file"></select>
+                    &nbsp;&nbsp;<select id="idSelectDialect"></select>
+                </div>
+                <div id="idGroup2">
+                    <button id="idButtonRecognition" type="button" onclick="startStopRecognition()" title="Start/stop video recognition speech. Ctrl + Q"/>Start Recognition</button>
+                    <div class="inputGroup" title="CPS (characters per second). Used to make corrections to start times as well as table colors. For English 10-14 CPS, Spanish 10-15 CPS, Japanese/Chinese/Korean 4-6 CPS , 10 CPS Belgium, 16 Finland">
+                        <label>CPS: </label>
+                        <input type="number" id="idCPS" value=10 min="1" max="20">
+                    </div>
+                    <div class="inputGroup">
+                        <select id="idFilter" name="filter">
+                            <option value="0">All</option>
+                            <option value="1">Only separations</option>
+                            <option value="2" selected>Only Groups</option>
+                        </select>
+                    </div>
+                    <div id="idGSeparation"  style="display:none" class="inputGroup" title="If the silence between sentences exceeds this time, a new line is created for the subtitle">
+                        <label>Separation (ms): </label>
+                        <input type="number" id="idDistanceSentences" value=0 min="0" max="3000">
+                    </div>
+                    <div class="inputGroup" title="Fix delay Recognition in milliseconds (0-2000). There is a time delay between when you start speaking and the time the program recognizes the word. Here you can make the correction of the times of the generated subtitles.">
+                        <label>Fix(ms): </label>
+                        <input type="number" id="idDelayRecognition" value=0 min="0" max="2000">
+                    </div>
+                </div>
+            </div>
+            <div class="divVideo skiptranslate">
+                <video id="idVideo" width="100%" height="100%" controls>
+                    <source src="" onerror="" type="video/mp4">
+                    <track kind="subtitles" id="idFileVTT" label="File">
+                </video>
+            </div>
+            <div class="divTranscript">
+                <div id="idCountCharacters" data-diff="false"></div>
+                <div id="idTranscript"></div>
+                <div class="divControlsEdit" id="idControlEdit" style="display:none">
+                    <a href="http://www.deepl.com" target="_blank">DeepL</a>
+                    <a href="http://translate.yandex.com" target="_blank">Yandex</a>
+                    <a href="http://www.bing.com/translator" target="_blank">Bing</a>
+                    <a href="http://translate.google.com/" target="_blank">Google</a>
+                    <div onclick='cBusy(); setTimeout("updateTable()", 500) ' title="Updates the table with the text line by line, if the lines are different, it does not update the table.">Update</div>
+                    <div onclick="closeEdit()" title="Returns to the previous mode. The data in the table is not modified.">Close</div>
+                </div>
+            </div>
+            <div id="idControlsSubs" class="divControlsSubs skiptranslate">
+                <div id="idGroup3">
+                    <select id="idCaptions" title="Select subtitles/captions for the video. File: Subtitle loaded from a file. Raw: It is the transcript of the video. Translations: This is the one that should be used to upload the translations. Real-Time: it is only used when the recognition is performed in real time.">
+                        <option value="File">File</option>
+                        <option value="Raw">Raw</option>
+                        <option value="Translation">Translation</option>
+                        <option value="MySubtitle">My Subtitle</option>
+                    </select>
+                    <input type="file" id="idFileSubtitle" name="File Subtitle" accept=".ass,.vtt,.srt" class="visually-hidden">
+                    <label title=" Load subtitles (ass,vtt, srt) for video" for="idFileSubtitle" id="idLabelSubtitle">Load Subtitle</label>
+                </div>
+                <div id="idGroup4">
+                    <button id="idButtonDown" type="button" title="Creates a table based on the video's subtitles (File, Raw, Translation), that is, subtitles loaded by voice recognition or by opening a subtitle file (alt+Click Mix with table)">⇩⇩⇩⇩⇩⇩</button>
+                    <button id="idButtonUp" type="button" onclick="tableToTrack(currentTrack)" title="The table is uploaded to the track the video (File, Raw, Translation).">⇧⇧⇧⇧⇧⇧</button>
+                    <label title="Automatically updates the transcript of the selected track when any changes are made to the table.">
+                        <input type="checkbox" id="idUpdateTrack">⇧⇧⇧ Auto-Update:
+                    </label>
+                    <label style="color:yellow; vertical-align:bottom;" id="idLabelTrackUpdate"></label>
+                    <button id="idButtonFixTime" type="button" onclick="fixTimeStartTable()" title="Correct start times based on subtitle CPS. It is very important to establish the CPS based on the language. Chinse/Japanese/Korean 4-6 CPS, 9-15 (english, belgium, spanish, italian, german)">Fix Time Start (10 CPS)</button>
+                    <button id="idDownloadTable" type="button" onclick="downloadTable()" title="Download subtitles from table">Download Table</button>
+                    <button id="idDownloadTrack" type="button" onclick="downloadTrack(currentTrack)" title="Download subtitles from the video track selected">Download Track</button>
+                    <div id="idDownloadSubtiles" class="inputGroup DowloadSubtitle">
+                        <b id="idLabelDownload">Download Subtitles (Translation):</b>
+                        <a id="idVTT" href="">.vtt</a>
+                        <a id="idSRT" href="">.srt</a>
+                        <a id="idASS" href="">.ass</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="divHidden" id="idWatchTranslation">- </div>
+        <ol>
+            <div class="divBottom">
+                <table border="1" cellpadding="5" id="idTable" border="0">
+                    <thead>
+                        <tr class="skiptranslate">
+                            <th>#</th>
+                            <th>
+                                <strong>Start</strong>
+                            </th>
+                            <th>End</th>
+                            <th>Settings cue</th>
+                            <th onclick="cleanTable()" >
+                                <img id="idRecycleBin">
+                            </th>
+                            <th>
+                                Text <span id="editAll" onclick="editTable()" title="Allows you to edit only the text, it is useful when you want to use other translation options, such as: www.deepl.com, www.bing.com/translator, translate.yandex.com/">(Edit All)</span>
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </ol>
+        <div id="idModal" class="idModal skiptranslate">
+            <div class="idModal-content">
+                <div class="idModal-header">
+                    <span class="close">&times;</span>
+                    <h2>Babelin Speech For voice recognition and real-time translation</h2>
+                </div>
+                <div class="idModal-body">
+                    <p>
+                        It uses the recognition and translation services offered by web browsers, which in this case is Chrome.
+					For this, it is only necessary to change the microphone <a href="https://www.youtube.com/watch?v=Bd3moKLV5sE" target="_blank">input to Stereo Mix.</a>
+                    </p>
+                    <iframe id="idFrame" width="420" height="315" src=""></iframe>
+                    <h3>Tips:</h3>
+                    <li>
+                        In local mode, permission will always be asked to access the microphone for safety. If a web server is running, it will only ask for permission once.
+						<a href="https://www.python.org/downloads/" target="_blank">Python </a>
+                        (python.exe -m http.server 8000 --bind 127.0.0.1), or <a href="https://www.voidtools.com/support/everything/http/" target="_blank">Everthing </a>
+                        can be used as web servers.
+
+                    </li>
+                    <li>Sometimes it is better to stop the recognition, for each person speaking.</li>
+                    <li>Use shortcuts in full screen</li>
+                    <h4>Known Issues.</h4>
+                    <li>After a few seconds of silence, the automatic recognition stops. </li>
+                    <li>Sometimes it stops recognizing the voice after a period of time, stop and start</li>
+                </div>
+                <div class="idModal-footer">
+                    <h4>Is open source - FREE</h4>
+                </div>
+            </div>
+        </div>
 <script>
-const vyt= "https://www.youtube.com/embed/Q-7P6Xgqwb0"
-const imgRecycleBin="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAABy0lEQVQ4T+2VPWhTURiGny9cMTglheKNVCGt+DNpwMFmSfFODg4GRETsolPdHAStxSvYLXbQCg4VBzFLaJ10MyAdMtYuLVKqxR8acLiZbKWF16HmJr3e2AjFyQc+OJyX9+Uc+M53oAMS2YenmMbhzW917uUUUirq2ZH5m7wCVxw8tNAeeOQAH8AVtz9PRj1/RCJXOok4OyWk7DZthTOjbrzWxJFI3jtG3l9ubU4UKZbeAf1BjT2WxSE022GYvAI8ewwXv13H4XVoPP8WKoUqEoP3QexGXXghJDdhRm0T0is3GAdgZHYGSHdbsyPMQBEmFq5RWUpjVncAfGjczbAGQE8GoEGXZHp+LfqPr4HfAEi06dvQECmGttpGIgl+2EI+pPA7t1RsqIRb7iWgtxwguUtjPIUnAY80KjHoQECiFkR9TWJDoyQgCXVYjyrxdBX6t/wP3X3+XagZ9T7woM/DrD6wlzs4Ax77KQNzm0fx+LThRX1NnOhGk0KFKhQAsDEWYXmRYcOGAajyfkuLo3XSfaznADa+d3x+cXz5QR4y4MbMC4lc6XTMOOumLk2vtn8v4fXNmFOZ/PxXrj5fbQ3lHTlx6yOXiw8wC0/6E1A7svTAq4CZAAAAAElFTkSuQmCC";
-idRecycleBin.src=imgRecycleBin;
-idDelayRecognition.value=FIX;
-idDistanceSentences.value=SEPARATION;
-var allTranscript=[],arrTranscript=[], languageName="",languageCode="";
-var	timer,timerRealTime,bTimeEqual,timeStart;
-var last,groupLast,timerLast,timeStartLast,timeEndLast,transcriptLast,resultsFinal;
-var trackRaw = idVideo.addTextTrack("subtitles","Raw");
-var trackTranslation = idVideo.addTextTrack("subtitles","Translation");
-var trackRealTime = idVideo.addTextTrack("subtitles","RealTime");
-var currentTrack,lastCueActive,aLastCueActive=[],cueRec,cueRealTime,indexCueNext=0;
-var sRecRed="<c.recordRed> ⊙ </c>"; var sRecWhite="<c.recordWhite> ⊙ </c>";
-var count,countP,cueCount,bStatusRecognition=false;waitTerminate=false;
-var nameVideo="";
+const vyt = "https://www.youtube.com/embed/Q-7P6Xgqwb0"
+const imgRecycleBin = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAABy0lEQVQ4T+2VPWhTURiGny9cMTglheKNVCGt+DNpwMFmSfFODg4GRETsolPdHAStxSvYLXbQCg4VBzFLaJ10MyAdMtYuLVKqxR8acLiZbKWF16HmJr3e2AjFyQc+OJyX9+Uc+M53oAMS2YenmMbhzW917uUUUirq2ZH5m7wCVxw8tNAeeOQAH8AVtz9PRj1/RCJXOok4OyWk7DZthTOjbrzWxJFI3jtG3l9ubU4UKZbeAf1BjT2WxSE022GYvAI8ewwXv13H4XVoPP8WKoUqEoP3QexGXXghJDdhRm0T0is3GAdgZHYGSHdbsyPMQBEmFq5RWUpjVncAfGjczbAGQE8GoEGXZHp+LfqPr4HfAEi06dvQECmGttpGIgl+2EI+pPA7t1RsqIRb7iWgtxwguUtjPIUnAY80KjHoQECiFkR9TWJDoyQgCXVYjyrxdBX6t/wP3X3+XagZ9T7woM/DrD6wlzs4Ax77KQNzm0fx+LThRX1NnOhGk0KFKhQAsDEWYXmRYcOGAajyfkuLo3XSfaznADa+d3x+cXz5QR4y4MbMC4lc6XTMOOumLk2vtn8v4fXNmFOZ/PxXrj5fbQ3lHTlx6yOXiw8wC0/6E1A7svTAq4CZAAAAAElFTkSuQmCC";
+idRecycleBin.src = imgRecycleBin;
+idDelayRecognition.value = FIX;
+idDistanceSentences.value = SEPARATION;
+var allTranscript = [], arrTranscript = [],arrSeparations=[], resultFinal=[],languageName = "", languageCode = "";
+var allResult, lastTranscript;
+var trackRaw = idVideo.addTextTrack("subtitles", "Raw");
+var trackTranslation = idVideo.addTextTrack("subtitles", "Translation");
+var trackMySubtitle = idVideo.addTextTrack("subtitles", "MySubtitle");
+var trackRealTime = idVideo.addTextTrack("subtitles", "RealTime");
+var currentTrack, lastCueActive, aLastCueActive = [], cueRec, cueRealTime, indexCueNext = 0;
+var sRecRed = "<c.recordRed> ⊙ </c>",sRecWhite = "<c.recordWhite> ⊙ </c>";
+var timer,count, countP, cueCount, bStatusRecognition = false,bGroup=false;
+var nameVideo = "", ID_G = 0, timeWaitFinish = -1,waitTerminate = false;
 var span = document.getElementsByClassName("close")[0];
-var observerTranscript = new MutationObserver( function (event){ vttRealTime(idTranscript.textContent)} );
-var observerTranslation = new MutationObserver( ()=> changeTranslation() );
-observerTranscript.observe(idTranscript, { attributes:true,childList: true,characterData: true});
-observerTranslation.observe(idWatchTranslation, { childList: true} );
+var observerTranscript = new MutationObserver(function(event) {vttRealTime(idTranscript.textContent)});
+var observerTranslation = new MutationObserver(()=>changeTranslation());
+var observerTable = new MutationObserver(changeTable);
+const observerOptionsTable = {attributes: false,childList: true,characterData: true,subtree: true};
+observerTranscript.observe(idTranscript, {attributes: false, childList: true,characterData: true,subtree: true });
+observerTranslation.observe(idWatchTranslation, {childList: true});
+observerTable.observe(idTable, observerOptionsTable);
 idFileVideo.onchange = (evt)=>loadSrcVideo(evt.target.files);
-idFileSubtitle.addEventListener('change', loadSrcSubtitle, false);
+idFileSubtitle.onchange = (evt)=>{loadSrcSubtitle(evt.target.files);evt.target.value = null};
 idVideo.onloadedmetadata = loadedVideo;
 idVideo.textTracks.onchange = changeTracks;
-idVideo.onended = ()=> bStatusRecognition && startStopRecognition();
-idCaptions.onchange = ()=> showingTrack(idVideo.textTracks[idCaptions.selectedIndex])
-idButtonDown.onclick=()=>{cBusy();setTimeout("VTTtoTable(currentTrack)", 600)};
-span.onclick= ()=> idModal.style.display = "none";
-window.onclick= (e)=>{ if(e.target == idModal) idModal.style.display = "none"}
+idVideo.onended = ()=>bStatusRecognition && startStopRecognition();
+idVideo.onkeydown = newSubtitle;
+idVideo.onkeyup = newSubtitle;
+idCPS.onchange = textButtonFixTime;
+idFilter.onchange = ()=>idGSeparation.style.display = idFilter.value==2?"none":"inline-block";
+idCaptions.onchange = ()=>showingTrack(idVideo.textTracks[idCaptions.selectedIndex]);
+idButtonDown.onclick = (e)=>{cBusy();setTimeout(()=>{VTTtoTable(currentTrack,e)},400)};
+span.onclick = ()=>idModal.style.display = "none";
+window.onclick = (e)=>{if (e.target == idModal)idModal.style.display = "none"}
 document.body.addEventListener("dragenter", dragStop, false);
 document.body.addEventListener("dragover", dragStop, false);
 document.body.addEventListener("drop", drop, false);
-Number.prototype.toTime = function() {return new Date(this * 1000).toISOString().substr(11, 12)}
-String.prototype.toSeconds = function() { return this.split(':').reduce((acc,time) => (60 * acc) + +time) };
-String.prototype.countCharacters = function() { return Array.from(this).length };
-String.prototype.toListItems = function() { return ("<li>"+this.split("\n").join("</li><li>")+"</li>") };
-String.prototype.removeExtension = function() { return this.split('.').slice(0, -1).join('.')||this } ;
-function cleanTable() { (idTable.lastChild.nodeName=="TBODY") && idTable.removeChild(idTable.lastChild) }
-function cBusy() {	document.body.style.cursor = "wait";}
-function stadistics(sentence, paragraph ){cueCount.text="     ";cueCount.text=` <c.countS>#: ${sentence} - ${paragraph} < /c> `; }
-function uCue(cue,text){cue.text="        ";cue.text=text;}//cue, set "" for update/bug?
-function removeAllCues(trackM){	while(trackM.cues.length>0){trackM.removeCue(trackM.cues[0]);}}
-function dragStop(e) {e.stopPropagation();e.preventDefault();}
-function drop(e) {dragStop(e);const dt = e.dataTransfer;const files = dt.files;	loadSrcVideo(files);}
-function nextCue(m)
-{
-	if (!currentTrack||!currentTrack.cues.length){return;}
-	let listCues=Object.values(currentTrack.cues).filter((c)=>c.line=="auto");
-	if(listCues.length>0)
-	{
-		indexCueNext = lastCueActive?(idVideo.paused?indexCueNext:listCues.indexOf(lastCueActive)):-1
-		indexCueNext+= (m=="NEXT")?(indexCueNext<listCues.length-1?1:0):(indexCueNext>0?-1:0)
-		let nCue = listCues[ indexCueNext ];
-		nCue && (idVideo.currentTime=nCue.startTime);
-	}
-}
-// Set default language / dialect.
-function changeTracks()
-{
-	currentTrack=undefined;
-	for(let t of idVideo.textTracks)
-	{
-		if(t.mode == "showing")
-			currentTrack=t;
-	}
-	idDownloadSubtiles.style.visibility="hidden";
-	if (currentTrack)
-	{
-		idGroup4.hidden=false;
-		idTable.hidden=false;
-		idCaptions.value=currentTrack.label;
-		currentTrack.oncuechange = cueActive
-	}
-	else
-	{
-		idGroup4.hidden=true;
-		idTable.hidden=true;
-	}
-}
-function changeTranslation()
-{
-	if (bStatusRecognition)
-	{
-		showingTrack(trackRealTime);
-		return;
-	}
-	if( document.documentElement.className.match('translated') )
-	{
-			showingTrack(trackTranslation);
-	}
-	idDownloadSubtiles.style.visibility="hidden";
-}
+Number.prototype.toTime = function() {return new Date(this * 1000).toISOString().substr(11, 12)};
+String.prototype.toSeconds = function() {return  +this.split(':').reduce((acc,time)=>(60 * acc) + +time).toFixed(3)};
+String.prototype.countCharacters = function() {return  Array.from(this).length};
+String.prototype.toListItems = function() {return  "<li>" + this.split("\n").join("</li><li>") + "</li>"};
+String.prototype.removeExtension = function() {return this.split('.').slice(0, -1).join('.') || this};
 
-function recognitionStart()
-{
-	
-	idButtonRecognition.style.borderStyle='inset'
-	arrTranscript  = [];
-	(!cueRec.track)&& initTrackRealTime();
-	count=0;	
-	countP=0;
-	stadistics(count,countP);
-	cueRec.text=sRecRed;
-	showingTrack(trackRealTime);
-	timer=0;timeStart=-1;timeStartLast=-1;timeEndLast=-1;
-	transcriptLast=""; 
-	timerLast=-1;groupLast=-1;last="";
-	bTimeEqual=false;
-	bStatusRecognition=true;
-	idVideo.play();
-	idButtonRecognition.innerHTML="Stop Recognition"
+function textButtonFixTime(){idButtonFixTime.textContent = `Fix Time Start:(${idCPS.value} CPS)`;if (idTable.children[1]) for (row of idTable.children[1].rows) checkCPS(row)}
+function cleanTable() { (idTable.lastChild.nodeName == "TBODY") && idTable.removeChild(idTable.lastChild)}
+function cBusy() { document.body.style.cursor = "wait"}
+function normalize(val, max, min) { return (val - min) / (max - min)}
+//function stadistics(sentence, paragraph) {cueCount.text = "     ";  cueCount.text = ` <c.countS>Lines ${[0,1].includes(+idFilter.value)?sentence:""}  ${[0,2].includes(+idFilter.value)?" Groups: " + paragraph:""} < /c> `;}
+function uCue(cue, text) { cue.text = text;cue.startTime=idVideo.currentTime-.1 }
+function removeAllCues(trackM) { while (trackM.cues.length > 0) trackM.removeCue(trackM.cues[0]) };
+function dragStop(e) {e.stopPropagation(); e.preventDefault()};
+function drop(e) {
+    dragStop(e);
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    [".srt", ".ass", ".vtt"].find((ext)=>files[0].name.toLowerCase().endsWith(ext)) ? loadSrcSubtitle(files) : loadSrcVideo(files);
+    e.target.value = null;
 }
-function recognitionTerminate()
-{
-	waitTerminate=true; //wait transcript final.
-	setTimeout(function (){
-		cueRec.text="";
-		idButtonRecognition.style.borderStyle="outset"
-		loadToRawVTT();
-		VTTtoTable(trackRaw);
-		idButtonRecognition.innerHTML="Start Recognition"
-		bStatusRecognition=false;
-		waitTerminate=false;
-	},400) 
+function listCuesCurrentTrackFilter() { return Object.values(currentTrack.cues).filter((c)=>c.line == "auto");}
+function pasteURLVideo(e) {
+    if (e.target.tagName != "BODY") return;
+    paste = (event.clipboardData || window.clipboardData).getData('text');
+    if (paste.includes("http")) idVideo.src = paste;
 }
+function getParentByTagName(node, tagname) {
+	var parent;
+	if (node === null || tagname === '') return;
+	parent  = node.parentNode;
+	tagname = tagname.toUpperCase();
 
-function showingTrack(trackM)
-{
-	for(let t of idVideo.textTracks)
-	{
-	 if (t==trackM)
-		t.mode = "showing";
-	 else
-		t.mode = "hidden";
-	}
-}
-function VTTtoTable(trackM)
-{
-	idDownloadSubtiles.style.visibility="hidden";
-	editAll.style.display="block";
-	cleanTable();
-	if (trackM.cues.length==0) {
-		document.body.style.cursor = "";
-		return;
-	}
-	tBody = idTable.createTBody()
-	for (let cue of trackM.cues)
-	{
-		let row = tBody.insertRow(-1);
-		let td0 = document.createElement("td");
-		let td1 = document.createElement("td");
-		let td2 = document.createElement("td");
-		let td3 = document.createElement("td");
-		let td4 = document.createElement("td");
-		let td5 = document.createElement("td");
-		let newImage = document.createElement('img');
-		newImage.src = imgRecycleBin;
-		newImage.onclick=()=>idTable.deleteRow(row.rowIndex);
-		td0.className="skiptranslate";
-		td1.className="skiptranslate";
-		td2.className="skiptranslate";
-		td3.className="skiptranslate";
-		td4.appendChild(newImage);
-		td0.innerHTML ="<li></li>";
-		td1.innerText = cue.startTime.toTime();
-		td2.innerText = cue.endTime.toTime();
-		td1.contentEditable=true;
-		td2.contentEditable=true;
-		td3.contentEditable=true;
-		td4.contentEditable=false;
-		td5.contentEditable=true;
-		p1 = (cue.align=="center") ? "" : `align:${cue.align};`
-		p2 = (cue.line=="auto") ? "" : `line:${cue.line};`
-		p3 = (cue.position=="auto") ? "" : `position:${cue.position};`
-		p4 = (cue.size==100) ? "" : `size:${cue.size};`
-		p5 = (cue.vertical=="") ? "" : `vertical:${cue.vertical};`
-		td3.innerText = p1+p2+p3+p4+p5;
-		td5.innerText = cue.text;
-		row.appendChild(td0);
-		row.appendChild(td1);
-		row.appendChild(td2);
-		row.appendChild(td3);
-		row.appendChild(td4);
-		row.appendChild(td5);
-		row.onclick=()=>idVideo.currentTime = row.children[1].innerText.toSeconds();
-	}
-	document.body.style.cursor = "";
-}
-function tableToSubtitle(trackM)
-{
-	showingTrack(trackM)
-	if (!idTable.children[1] || trackM.constructor.name!="TextTrack" || !trackM.cues)		return;
-	let cueVtt;
-	let p,p0,p1;
-	let aASS=["\uFEFF" + headASS],aSRT=["\uFEFF"],aVTT=["\uFEFFWEBVTT\r\n\r\n"];
-	removeAllCues(trackM);
-	let i=1;let j=1;
-	for (let row of idTable.children[1].rows)
-	{
-		let tStart = row.children[1].textContent;
-		let tEnd = row.children[2].textContent;
-		let setting = row.children[3].textContent;
-		let text = row.children[5].textContent;
-		cueVtt =  new VTTCue(tStart.toSeconds(),tEnd.toSeconds(),text)
-		for(let a of setting.split(";") )
-		{
-		 if (a=="") continue;
-		 p = a.split(":");
-		 //clean quotation marks
-		 p0=(p[0]!=undefined)?p[0].replace('"','').replace('"','').trim():"";
-		 p1=(p[1]!=undefined)?p[1].replace('"','').replace('"','').trim():"";
-		 (p0=="align") && ( cueVtt.align=p1 );
-		 (p0=="line") && ( cueVtt.line = isNaN(p1)?"auto":+p1 );
-		 (p0=="position") && ( cueVtt.position= isNaN(p1)?"auto":+p1 );
-		 (p0=="size") && ( cueVtt.size= isNaN(p1)?100:+p1 );
-		 (p0=="vertical") && ( cueVtt.vertical=p1 );
+	while (parent.tagName !== "HTML") {
+		if (parent.tagName === tagname) {
+			return parent;
 		}
-		trackM.addCue(cueVtt);
-		let textVTT = `${j}\r\n${tStart} --> ${tEnd} ${setting.replace(";"," ")}\r\n${text}\r\n\r\n`;
-		let textSRT = `${i}\r\n${tStart.replace(".",",")} --> ${tEnd.replace(".",",")}\r\n${text}\r\n\r\n`;
-		let textASS =`Dialogue: 0,${tStart.slice(1,-1)},${tEnd.slice(1,-1)},Default,,0,0,0,,${text}\r\n`;
-
-		if (!isNaN(cueVtt.line)) // line is different default/auto, 
-		{
-			textASS=textASS.replace(",Default,,",",Top,,")
-		}
-		else	//srt does not allow times overlaps
-		{
-			aSRT.push(textSRT);
-			i++;
-		}
-		aVTT.push(textVTT);
-		aASS.push(textASS);
-		j++;
-	}
-	let cc=""
-	idCaptions.value=="Raw"&&(cc="." + languageCode);
-	idCaptions.value=="Translation"&&(cc="."+navigator.language.split("-")[0]);
-	if( document.documentElement.className.match('translated') )
-		{
-			idLabelDownload.innerHTML="Download Subtitles (Translation):";
-			cc="."+navigator.language.split("-")[0];
-		}
-	else
-		idLabelDownload.innerHTML=`Download Subtitles (${currentTrack.label}):`;
-	idVTT.href = URL.createObjectURL(new Blob(aVTT, {type: "text/plain"}));
-	idVTT.download=`${nameVideo}${cc}.vtt`;
-	idASS.href = URL.createObjectURL(new Blob(aASS, {type: "text/plain"}));
-	idASS.download=`${nameVideo}${cc}.ass`;
-	idSRT.href = URL.createObjectURL(new Blob(aSRT, {type: "text/plain"}));
-	idSRT.download=`${nameVideo}${cc}.srt`;
-	idDownloadSubtiles.style.visibility="visible";
-		
-}
-function closeEdit()
-{
-	document.body.style.cursor ="";
-	idControlsUP.style.visibility="visible";
-	idControlEdit.style.display="none";
-	idGroup3.style.visibility="visible";
-	idGroup4.style.visibility="visible";
-	document.body.onkeydown=keyEvent;
-	document.onselectionchange = "";
-	idTranscript.onpaste="";
-	idTranscript.title="";
-	idTranscript.innerHTML="";
-	idSelectDialect.style.visibility=idSelectDialect.visibilityTemp;
-}
-function editTable()
-{
-	if (!idTable.children[1])
-		return;
-	idControlEdit.style.display="block";
-	idControlsUP.style.visibility="hidden";
-	idGroup3.style.visibility="hidden";
-	idGroup4.style.visibility="hidden";
-	idSelectDialect.visibilityTemp=idSelectDialect.style.visibility;
-	idSelectDialect.style.visibility="hidden";
-	idTranscript.title="Here you can copy the text (ctrl-a + ctrl-c), translate it in other translators such as yandex or deepl, and paste the translated text, and update the table."
-	document.body.onkeydown="";
-	document.onselectionchange = function(e) { idCountCharacters.innerText = (document.activeElement.nodeName=="OL")? 
-	`T:${idTranscript.innerText.split("\n").length}/${idTable.tBodies[0].childNodes.length} C:${document.getSelection().toString().countCharacters()}/${idTranscript.innerText.toString().countCharacters()}`:""
-	idCountCharacters.dataset.diff = (idTable.tBodies[0].childNodes.length!=idTranscript.innerText.split("\n").length)?true:false;
-	};
-	let listText=document.createElement("ol");
-	listText.contentEditable=true;
-	idTranscript.onpaste=()=>{//fix node duplicates(li) on paste in ol
-	(idTranscript.firstChild.nodeName="OL")&&setTimeout( ()=>idTranscript.firstChild.innerHTML=idTranscript.firstChild.innerText.trim().toListItems() ,100);
+		parent = parent.parentNode;
 	}
 
-	for (let row of idTable.children[1].rows)
-	{
-		let olText = document.createElement("li");
-		olText.innerText=row.children[5].innerText.split("\n").join(". ").replace(/[{<].*?[>}]/g," ").replace(/\s+/g," ");
-		listText.appendChild(olText);
-	}
-	idTranscript.innerHTML=listText.outerHTML;
+	return parent;
 }
-function updateTable()
-{
-	if(idTable.tBodies[0].childNodes.length!=idTranscript.innerText.split("\n").length)
+function changeTable(me) {
+    idDownloadSubtiles.style.visibility = "hidden";
+    idUpdateTrack.checked && tableToTrack(currentTrack);
+	for (m of me )
 	{
-		alert(`Table length:${idTable.tBodies[0].childNodes.length} and translation ${idTranscript.innerText.split("\n").length} are different`);
-		document.body.style.cursor = "";
-		return;
+		if (m.target.nodeName == "#text" && m.target.textContent != "")   
+			cell=m.target.parentNode;
+		else if (m.target.nodeName == "TD")
+			cell=m.target;
+		else
+			continue;
+		if (m.target.parentNode.nodeName == "FONT")
+			cell=getParentByTagName(cell,"TD")
+
+		colorCells(cell);
+		checkCPS(cell.parentNode)
 	}
-	let aText=idTranscript.innerText.split("\n");
-	idTable.tBodies[0].childNodes.forEach((row,index)=>{
-		let text = aText[index];let tags=[];
-		row.children[5].textContent.replace(  /[{<].*?[>}]/g,(t)=>{tags.push(t);tags.length==1&&tags.push(text)}  )
-		row.children[5].textContent = (tags.length)?tags.join(""):text;
-	})
+    
+}
+function colorCells(target) {
+    let tStart = target.parentNode.children[1].textContent.toSeconds();
+    let tEnd = target.parentNode.children[2].textContent.toSeconds();
+    let text = target.parentNode.children[5].textContent;
+    let indexCell = Array.prototype.findIndex.call(target.parentNode.children, (c)=>c === target)
+    if (tStart >= tEnd)
+        target.parentNode.style.backgroundColor = "rgba(255,0,0)";
+    else
+        target.parentNode.style.backgroundColor = "rgba(255,255,255)";
+
+    if ([1, 2, 5].includes(indexCell)) {
+        let cpsText = text.length / (tEnd - tStart)
+        target.parentNode.children[0].style.backgroundColor = `rgba(255,0 , 0,${normalize(cpsText, +idCPS.value * 3, +idCPS.value)} )`
+        if (indexCell == 1)
+            checkTimePrevious(target, tStart);
+
+        else if (indexCell == 2)
+            if (target.parentNode.nextSibling)
+                checkTimePrevious(target.parentNode.nextSibling.children[1], target.parentNode.nextSibling.children[1].textContent.toSeconds());
+    }
+}
+function checkTimePrevious(target, tStart) {
+    if (target.parentNode.previousSibling) {
+        previousTimeEnd = target.parentNode.previousSibling.children[2].textContent.toSeconds();
+        target.parentNode.children[1].style.backgroundColor = `rgba(255,255,0,${+(previousTimeEnd > tStart)} )`;
+        target.parentNode.previousSibling.children[2].style.backgroundColor = `rgba(255,255,0,${+(previousTimeEnd > tStart)} )`;
+    }
+}
+
+function cueNear(listCues, m) {
+    let t = idVideo.currentTime, i;
+    for (i = 0; i < listCues.length; i++)
+        if (t <= listCues[i].startTime)
+            return m == "NEXT" ? i - 1 : i;
+
+    return i;
+}
+function nextCue(m) {
+    if (!currentTrack || !currentTrack.cues.length) return;
+    ;let listCues = listCuesCurrentTrackFilter();
+    if (listCues) {
+        indexCueNext = currentTrack.activeCues.length ? (listCues.indexOf(lastCueActive)) : cueNear(listCues, m);
+        indexCueNext += (m == "NEXT") ? (indexCueNext < listCues.length - 1 ? 1 : 0) : (indexCueNext > 0 ? -1 : 0);
+        let nCue = listCues[indexCueNext];
+        nCue && (idVideo.currentTime = nCue.startTime + .01);
+        //add .01 seconds, sometimes it doesn't show the subtitle
+    }
+}
+function changeTracks() {
+    currentTrack = undefined;
+    for (let t of idVideo.textTracks) {
+        if (t.mode == "showing")
+            currentTrack = t;
+    }
+    idDownloadSubtiles.style.visibility = "hidden";
+    if (currentTrack) {
+        idGroup4.hidden = false;
+        idTable.hidden = false;
+        idCaptions.value = currentTrack.label;
+        currentTrack.oncuechange = cueActives;
+        idDownloadTrack.innerText = "Download Track: " + currentTrack.label;
+        idLabelTrackUpdate.textContent = currentTrack.label;
+    } else {
+        idGroup4.hidden = true;
+        idTable.hidden = true;
+    }
+}
+function changeTranslation() {
+    if (bStatusRecognition) {
+        showingTrack(trackRealTime);
+        return;
+    }
+    if (document.documentElement.className.match('translated')) {
+        showingTrack(trackTranslation);
+    }
+    idDownloadSubtiles.style.visibility = "hidden";
+}
+
+function recognitionStart() {
+    window.onbeforeunload = (e)=>{e.returnValue = true};
 	document.body.style.cursor = ""
+    idButtonRecognition.style.borderStyle = 'inset'
+    arrTranscript = [];
+	arrSeparations=[];
+	resultFinal=[];
+	allTimend=[];
+	lastTranscript="";
+    ID_G++;
+	timer=-1;
+    (!cueRec.track) && initTrackRealTime();
+    count = 0;
+    countP = 0;
+    cueRec.text = sRecRed;
+	cueRealTime.text="";
+    showingTrack(trackRealTime);
+    bStatusRecognition = true;
+    idVideo.play();
+    idButtonRecognition.innerHTML = "Stop Recognition";
 }
-function loadedVideo()
-{
-	initTrackRealTime();
-	removeAllCues(trackRaw);
-	removeAllCues(trackTranslation);
-	cleanTable();
+function recognitionTerminate() {
+    waitTerminate = true;
+    idVideo.pause();
+    timeWaitFinish = setTimeout(cleanTerminate, 1000);//wait transcript final.
 }
-function initTrackRealTime()
-{
-	removeAllCues(trackRealTime);
-	cueRealTime = new VTTCue(0, idVideo.duration, "" );
-	cueRec = new VTTCue(0, idVideo.duration, "" );
-	cueRec.align="left";
-	cueRec.line=0;
-	cueCount = new VTTCue(0, idVideo.duration, "" );
-	cueCount.align="right";
-	cueCount.line=2;
-	trackRealTime.addCue(cueRealTime);
-	trackRealTime.addCue(cueRec);
-	trackRealTime.addCue(cueCount);
+function cleanTerminate() {
+    cueRec.text = "";
+	cueRealTime.text="";
+    idButtonRecognition.style.borderStyle = "outset";
+    loadTranscriptToRawVTT();
+    VTTtoTable(trackRaw);
+    idButtonRecognition.innerHTML = "Start Recognition";
+    bStatusRecognition = false;
+    waitTerminate = false;
+    timeWaitFinish = -1;
 }
-function recognitionResult(e)
+function showingTrack(trackM) {
+    for (let t of idVideo.textTracks) {
+        if (t == trackM)
+            t.mode = "showing";
+        else
+            t.mode = "hidden";
+    }
+}
+function VTTtoTable(trackM,e) {
+    if (trackM.cues.length == 0) { document.body.style.cursor = ""; return }
+	observerTable.disconnect();
+    idDownloadSubtiles.style.visibility = "hidden";
+    editAll.style.display = "block";
+	bmixTable=(e && (e.ctrlKey || e.altKey))?true:false;
+
+	if(!bmixTable)
+	{
+		cleanTable();
+		tbody = idTable.createTBody();
+		tbody.id = "idTBody";
+	}
+	
+	
+    for (let cue of trackM.cues) {
+        rowTable(cue.startTime, cue.endTime, settingCue(cue), cue.text, -1);
+    }
+    document.body.style.cursor = "";
+    observerTable.observe(idTable, observerOptionsTable);
+}
+function rowTable(tStart, tEnd, settingscue, transcription, indexRow) {
+
+    if (typeof idTBody=="undefined") return;
+	
+	let row = idTBody.insertRow(indexRow);
+    let td0 = document.createElement("td");
+    let td1 = document.createElement("td");
+    let td2 = document.createElement("td");
+    let td3 = document.createElement("td");
+    let td4 = document.createElement("td");
+    let td5 = document.createElement("td");
+    let newImage = document.createElement('img');
+    td1.name = "TimeStart";
+    td2.name = "TimeEnd";
+    td5.name = "transcription";
+    newImage.src = imgRecycleBin;
+    newImage.onclick = ()=>idTable.deleteRow(row.rowIndex);
+    td0.className = "skiptranslate";
+    td1.className = "skiptranslate";
+    td2.className = "skiptranslate";
+    td3.className = "skiptranslate";
+    td4.appendChild(newImage);
+    td0.innerHTML = "<li></li>";
+    td1.textContent = tStart.toTime();
+    td2.textContent = tEnd.toTime();
+    td1.onkeypress = addRemMiliseconds;
+    td2.onkeypress = addRemMiliseconds;
+    td1.contentEditable = true;
+    td2.contentEditable = true;
+    td3.contentEditable = true;
+    td4.contentEditable = false;
+    td5.contentEditable = true;
+    td3.textContent = settingscue;
+    td5.textContent = transcription;
+    row.appendChild(td0);
+    row.appendChild(td1);
+    row.appendChild(td2);
+    row.appendChild(td3);
+    row.appendChild(td4);
+    row.appendChild(td5);
+	checkCPS(row);
+    checkTimePrevious(td1, tStart);
+    if (tStart >= tEnd)
+        row.style.backgroundColor = "rgb(255,0,0)";
+
+    row.onclick = ()=>{idVideo.currentTime = row.children[1].textContent.toSeconds();colorCells(row.children[1]); }
+    ;
+}
+function checkCPS(row)
 {
-	let updateT=false;
-	if (timeStart<0) timeStart=idVideo.currentTime;
-	timeEnd=idVideo.currentTime;
-	let groupSentence=e.resultIndex;
-	transcript=e.results[groupSentence][0].transcript;
-	allTranscript.push([timeStart,timeEnd,transcript,groupSentence,e.results[groupSentence].isFinal])
+    let cells = row.children;
+	let cpsText = cells[5].textContent.length / (cells[2].textContent.toSeconds() - cells[1].textContent.toSeconds() );
+    cells[0].style.backgroundColor = `rgba(255,0 , 0, ${normalize(cpsText, +idCPS.value * 3, +idCPS.value)})`;
+}
+function settingCue(cue) {
+    p1 = (cue.align == "center") ? "" : `align:${cue.align};` ;
+    p2 = (cue.line == "auto") ? "" : `line:${cue.line};` ;
+    p3 = (cue.position == "auto") ? "" : `position:${cue.position};` ;
+    p4 = (cue.size == 100) ? "" : `size:${cue.size};` ;
+    p5 = (cue.vertical == "") ? "" : `vertical:${cue.vertical};` ;
+    return p1 + p2 + p3 + p4 + p5;
+}
+function downloadTrack(trackM) {
+    let arrayS = [];
+    idDownloadSubtiles.style.visibility = "hidden";
+    if (trackM.cues.length == 0) {
+        document.body.style.cursor = "";
+        return;
+    }
+    for (let cue of trackM.cues) { 
+		arrayS.push([cue.startTime.toTime(), cue.endTime.toTime(), settingCue(cue), cue.text]) 
+	}
+    arrayToSubtitle(arrayS, trackM.label);
+}
+function downloadTable() {
+    let arrayS = [];
+    idDownloadSubtiles.style.visibility = "hidden";
+    if (!idTable.children[1])
+        return;
+    for (let row of idTable.children[1].rows) {
+        arrayS.push([row.children[1].textContent, row.children[2].textContent, row.children[3].textContent, row.children[5].textContent])
+    }
+    arrayToSubtitle(arrayS, "Table");
+}
+function arrayToSubtitle(arrayS, labelText) {
+    let aASS = ["\uFEFF" + headASS], aSRT = ["\uFEFF"], aVTT = ["\uFEFFWEBVTT\r\n\r\n"];
+    let i = 1, j = 1;
+    for (let row of arrayS) {
+        let tStart = row[0], tEnd = row[1],setting = row[2], text = row[3];
+        let textSRT = `${i}\r\n${tStart.replace(".", ",")} --> ${tEnd.replace(".", ",")}\r\n${text}\r\n\r\n` ;
+        let textVTT = `${j}\r\n${tStart} --> ${tEnd} ${setting.replace(";", " ")}\r\n${text}\r\n\r\n` ;
+        let textASS = `Dialogue: 0,${tStart.slice(1, -1)},${tEnd.slice(1, -1)},Default,,0,0,0,,${text}\r\n`;
+        if (setting.includes("line:0")) // line is different default/auto, 
+        {
+            textASS = textASS.replace(",Default,,", ",Top,,");
+        } else //srt does not allow times overlaps
+        {
+            aSRT.push(textSRT);
+			i++;
+        }
+        aVTT.push(textVTT);aASS.push(textASS);j++;
+    }
+    let cc = "";
+    idCaptions.value == "Raw" && (cc = "." + languageCode);
+    idCaptions.value == "Translation" && (cc = "." + navigator.language.split("-")[0]);
+    if (document.documentElement.className.match('translated')) {
+        idLabelDownload.innerHTML = "Download Subtitles (Translation):";
+        cc = "." + navigator.language.split("-")[0];
+    } else
+        idLabelDownload.innerHTML = `Download Subtitles (${labelText}):`;
+    idVTT.href = URL.createObjectURL(new Blob(aVTT,{type: "text/plain"}));
+    idVTT.download = `${nameVideo}${cc}.vtt`;
+    idASS.href = URL.createObjectURL(new Blob(aASS,{type: "text/plain"}));
+    idASS.download = `${nameVideo}${cc}.ass`;
+    idSRT.href = URL.createObjectURL(new Blob(aSRT,{type: "text/plain"}));
+    idSRT.download = `${nameVideo}${cc}.srt`;
+    idDownloadSubtiles.style.visibility = "visible";
+}
+function tableToTrack(trackM) {
+    showingTrack(trackM)
+    if (!idTable.children[1] || trackM.constructor.name != "TextTrack" || !trackM.cues)  return;
+    let cueVtt, p, p0, p1;
+    removeAllCues(trackM);
+    for (let row of idTable.children[1].rows) {
+        let tStart = row.children[1].textContent, tEnd = row.children[2].textContent, setting = row.children[3].textContent;
+        let text = row.children[5].textContent;
+        cueVtt = new VTTCue(tStart.toSeconds(),tEnd.toSeconds(),text);
+        for (let a of setting.split(";")) {
+            if (a == "")
+                continue;
+            p = a.split(":");
+            //clean quotation marks
+            p0 = (p[0] != undefined) ? p[0].replace('"', '').replace('"', '').trim() : "";
+            p1 = (p[1] != undefined) ? p[1].replace('"', '').replace('"', '').trim() : "";
+            (p0 == "align") && (cueVtt.align = p1);
+            (p0 == "line") && (cueVtt.line = isNaN(p1) ? "auto" : +p1);
+            (p0 == "position") && (cueVtt.position = isNaN(p1) ? "auto" : +p1);
+            (p0 == "size") && (cueVtt.size = isNaN(p1) ? 100 : +p1);
+            (p0 == "vertical") && (cueVtt.vertical = p1);
+        }
+        trackM.addCue(cueVtt);
+    }
+    let cc = "";
+    idCaptions.value == "Raw" && (cc = "." + languageCode);
+    idCaptions.value == "Translation" && (cc = "." + navigator.language.split("-")[0]);
+}
+function closeEdit() {
+    document.body.style.cursor = "";
+    idControlsUP.style.visibility = "visible";
+    idControlEdit.style.display = "none";
+    idGroup3.style.visibility = "visible";
+    idGroup4.style.visibility = "visible";
+    document.body.onkeydown = keyEvent;
+    document.onselectionchange = "";
+    idTranscript.onpaste = "";
+    idTranscript.title = "";
+    idTranscript.innerHTML = "";
+    idSelectDialect.style.visibility = idSelectDialect.visibilityTemp;
+}
+function editTable() {
+    if (!idTable.children[1]) return;
+    idControlEdit.style.display = "block";
+    idControlsUP.style.visibility = "hidden";
+    idGroup3.style.visibility = "hidden";
+    idGroup4.style.visibility = "hidden";
+    idSelectDialect.visibilityTemp = idSelectDialect.style.visibility;
+    idSelectDialect.style.visibility = "hidden";
+    idTranscript.title = "Here you can copy the text (ctrl-a + ctrl-c), translate it in other translators such as yandex or deepl, and paste the translated text, and update the table."
+    document.body.onkeydown = "";
+    document.onselectionchange = function(e) {
+        idCountCharacters.innerText = (document.activeElement.nodeName == "OL") ? `T:${idTranscript.innerText.split("\n").length}/${idTable.tBodies[0].childNodes.length} C:${document.getSelection().toString().countCharacters()}/${idTranscript.innerText.toString().countCharacters()}` : ""
+        idCountCharacters.dataset.diff = (idTable.tBodies[0].childNodes.length != idTranscript.innerText.split("\n").length) ? true : false;
+    }
+    ;
+    let listText = document.createElement("ol");
+    listText.contentEditable = true;
+    idTranscript.onpaste = ()=>{
+        //fix node duplicates(li) on paste in ol
+        (idTranscript.firstChild.nodeName = "OL") && setTimeout(()=>idTranscript.firstChild.innerHTML = idTranscript.firstChild.innerText.trim().toListItems(), 100);
+    }
+
+    for (let row of idTable.children[1].rows) {
+        let olText = document.createElement("li");
+        olText.innerText = row.children[5].innerText.split("\n").join(". ").replace(/[{<].*?[>}]/g, " ").replace(/\s+/g, " ");
+        listText.appendChild(olText);
+    }
+    idTranscript.innerHTML = listText.outerHTML;
+}
+function updateTable() {
+    if (idTable.tBodies[0].childNodes.length != idTranscript.innerText.split("\n").length) {
+        alert(`Table length:${idTable.tBodies[0].childNodes.length} and translation ${idTranscript.innerText.split("\n").length} are different`);
+        document.body.style.cursor = "";
+        return;
+    }
+    let aText = idTranscript.innerText.split("\n");
+    idTable.tBodies[0].childNodes.forEach((row,index)=>{
+        let text = aText[index];
+        let tags = [];
+        row.children[5].textContent.replace(/[{<].*?[>}]/g, (t)=>{
+            tags.push(t);
+            tags.length == 1 && tags.push(text);
+        }
+        )
+        row.children[5].textContent = (tags.length) ? tags.join("") : text;
+    }
+    )
+    document.body.style.cursor = "";
+}
+function fixTimeStartTable() {
+    idTable.tBodies[0]&&idTable.tBodies[0].childNodes&&idTable.tBodies[0].childNodes.forEach((row,index)=>{
+
+        let tStart = row.children[1].textContent.toSeconds();
+        let tEnd = row.children[2].textContent.toSeconds();
+        let text = row.children[5].textContent.length;
+
+        let tEstimated = text / +idCPS.value;
+        if (tEnd - tStart < tEstimated) {
+            tCorrected = tEnd - tEstimated
+            timePrevious = row.previousSibling&&row.previousSibling.children[2]&&row.previousSibling.children[2].textContent&&row.previousSibling.children[2].textContent.toSeconds();
+            if (timePrevious)
+                tCorrected = timePrevious > tCorrected ? timePrevious + .1 : tCorrected;
+
+            row.children[1].textContent = tCorrected.toTime();
+            colorCells(row.children[1]);
+            colorCells(row.children[2]);
+        }
+    }
+    )
+}
+function loadedVideo() {
+    initTrackRealTime();
+    ID_G = 0;
+    allTranscript = [];
+    removeAllCues(trackRaw);
+    removeAllCues(trackTranslation);
+    removeAllCues(trackMySubtitle);
+    cleanTable();
+}
+function initTrackRealTime() {
+    removeAllCues(trackRealTime);
+    cueRealTime = new VTTCue(0,idVideo.duration,"");
+	cueRealTime.snapToLines=true;//For bug Version 106, lines jump down to top (setTimeout)
+    cueRec = new VTTCue(0,idVideo.duration,"");
+    cueRec.align = "left";
+    cueRec.line = 0;
+	cueRec.snapToLines=false;
+    cueCount = new VTTCue(0,idVideo.duration,"");
+    cueCount.align = "right";
+    cueCount.line = 2;
+	cueCount.snapToLines=false;
+    trackRealTime.addCue(cueRealTime);
+    trackRealTime.addCue(cueRec);
+    trackRealTime.addCue(cueCount);
+}
+
+
+function fixTimeStart(tStart, tEnd, text,arrTimesEnd)
+{
+	if (tStart>=tEnd) {
+		tStart = tEnd - (text.length / +idCPS.value);
+		let aTimesEnd=arrTimesEnd.filter((a)=>a<tEnd);
+		let last = aTimesEnd&&aTimesEnd.slice(-1)[0];
+		let lastTimeEnd=last?last:0;
+		if (lastTimeEnd > tStart)  
+			tStart = lastTimeEnd + .1;
+	}
+	if (tEnd-tStart<0.5) tStart=tEnd-0.5;
+	return [tStart, tEnd, text]
+}
+
+function timesPhrase(arr,arrTimesEnd)  // [ [2.34,"my","ID_0_1"],[3.52,"my Trans","ID_0_1"],[4.49,"my Transcription","ID_0_1"] ]
+{
+		let aSep=[],tLastStart,tLastEnd,textLast,fixR=0;
+		let tBreak = idDistanceSentences.value/1000;
+		arr.forEach(function(a, index, array) {
+		
+			if (index == 0 || tLastStart < 0) { tLastStart = a[0];tLastEnd = a[0];textLast = a[1];idGroupLast=a[2];  }
+			if (  ( a[0] - tLastEnd + fixR> tBreak && textLast!=a[1] ) || idGroupLast!=a[2] || index == array.length - 1 ) 
+			{
+				aSep.push(   [tLastStart, tLastEnd, textLast,idGroupLast] );
+				if (index == array.length - 1 && textLast!=a[1] ) {
+
+					if (a[0] - tLastEnd + fixR> tBreak) { aSep.push( [ a[0], a[0], a[1], a[2] ] ) }
+					else { aSep[aSep.length - 1][1] = a[0]; aSep[aSep.length - 1][2] = a[1]	}
+				}
+				tLastStart = a[0];
+			}
+			
+			fixR = (index != 0 && textLast == a[1] && idGroupLast==a[2])?a[0]-tLastEnd:0; //Fix time for same text repeat
+			tLastEnd = a[0];textLast = a[1]; idGroupLast=a[2] });
+			
+		backText=aSep.map((c)=>c[2]);
+		//remove text duplicate previous line and Fix Start Times
+		aSep.forEach( function(a,index)
+			{ 
+				a[2] =  (index==0 || a[3]!=aSep[index-1][3] )?a[2]:findDifference(backText[index-1],a[2]);
+				[a[0]] = fixTimeStart(a[0], a[1], a[2], arrTimesEnd )
+			});
+ return aSep; //[ 2.34, 4.49, "Transcription","ID_0_1" ]
+}
+function recognitionResult(e) {
+    allResult = e;//log
+    //uCue(cueRec, sRecWhite);
+    let IDGroupSentence = "ID_" + ID_G + "_" + e.resultIndex;
+    transcript = e.results[e.resultIndex][0].transcript;
+	isFinal= e.results[e.resultIndex].isFinal;
+    allTranscript.push([idVideo.currentTime, transcript, IDGroupSentence, isFinal]);
+    if(!isFinal) {arrSeparations.push([idVideo.currentTime,transcript,IDGroupSentence]), allTimend.push(idVideo.currentTime)}
 	//add transcription final (group transcription/good)
+    if (isFinal) {
+        countP++;
+		let arrTemp=timesPhrase( arrSeparations, allTimend );
+		arrTranscript=arrTranscript.concat(arrTemp);
+		tStart = arrTemp.length?arrTemp[0][0]:idVideo.currentTime;
+		tEnd = arrTemp.length?arrTemp.slice(-1)[0][1]:idVideo.currentTime;
+		[tStart] = fixTimeStart(tStart, tEnd, transcript, resultFinal.map((a)=>a[1]) );
+		resultFinal.push([tStart,tEnd,transcript,IDGroupSentence]);
+		arrSeparations=[];
+		bGroup=true;
+		if (timeWaitFinish != -1) {clearTimeout(timeWaitFinish);cleanTerminate();};
+    }
+	else {
+		bGroup=false;
+	}
+	if (transcript==lastTranscript) return;
 	
-	if(e.results[groupSentence].isFinal)
-	{
-		countP++;
-		stadistics(count,countP);
-		arrTranscript.push([groupSentence, 0,0,transcript,1] );
-		timeStart=-1;
-		return;
-	}
-	if(waitTerminate) return;
-	if (bTimeEqual)
-	{
-		updateT=true;
-		bTimeEqual=false;
-	}
-	uCue(cueRec,sRecWhite);
-	//not add duplicate transcript for same group 
-	if (last==transcript && groupSentence==groupLast)
-	{
-		if (updateT) arrTranscript.slice(-1)[2]=timeEnd;
-		return;
-	}
-	//flag for last timer is same for start==end  
-	if (timeStart==timeEnd) 
-		bTimeEqual=true;
-
-	last=transcript;
 	clearTimeout(timer);
-	timer = setTimeout(	 function(){
-						timeStartLast=-1; count++;
-						stadistics(count,countP);
-						uCue(cueRec,sRecRed);
-						arrTranscript.push([groupSentence, timeStart,timeEnd,transcript,0] ); 
-						timeStart=-1; 
-						},idDistanceSentences.value );
-	groupLast=groupSentence;
-	timeStartLast=timeStart;
-	timeEndLast=timeEnd;
-	transcriptLast=transcript;
-	timerLast=timer;
-	idTranscript.innerHTML = transcript;
+	timer = setTimeout(	 function(){lastTranscript=transcript;}, idDistanceSentences.value   );
+	
+	idTranscript.removeAttribute("_msthash");
+	idTranscript.innerHTML = idFilter.value==2?transcript:findDifference(lastTranscript,transcript);
 }
+
 //update text/transcript in video(real-time)
-function vttRealTime(text)
-{
-	if(!trackRealTime || !cueRealTime ) return;
-	
-	if (document.documentElement.className.match('translated') )
-	{
-		//prevents mixing translations and text raw(transcript) for real-time when translated/google active.
-		if (idTranscript.lastChild.nodeName=="#text")
-			return;
-	} 
-	cueRealTime.text=text;
-	clearTimeout(timerRealTime);
-	timerRealTime = setTimeout( 'uCue(cueRec,sRecRed);uCue(cueRealTime," ");',2000 );
+function vttRealTime(text) {
+    if (!trackRealTime || !cueRealTime) return;
+
+    if (document.documentElement.className.match('translated')) //prevents mixing translations and text raw(transcript) for real-time when translated/google active.
+        if (idTranscript.lastChild.nodeName == "#text")
+            return;
+
+	if (idTranscript.hasAttribute("_msttexthash")) 
+		if (!idTranscript.hasAttribute("_msthash")) 
+			return;	
+	cueRealTime.text = `<c.${bGroup?"textGreen":"textWhite"}> ${text}`+"</c>" ;
+	cueRealTime.endTime=idVideo.currentTime+2
 }
-function loadToRawVTT()
-{
-	showingTrack(trackRaw);
-	for (let i=0;i<arrTranscript.length;i++)
-	  {
-		let tStart = arrTranscript[i][1]-idDelayRecognition.value/1000;
-		let tEnd  = arrTranscript[i][2]-idDelayRecognition.value/1000;
-		let text = arrTranscript[i][3];
-		let indexGroup = arrTranscript[i][0];
-		let transcriptGroupFinal=arrTranscript[i][4];
-		let cueVtt = new VTTCue(0,0,"")
-		if(arrTranscript[i][4]==1)
-		{
-			let arrGroup = arrTranscript.filter(g => g[0]==indexGroup && g[4]==0)
-			if (!arrGroup[0]) continue; 
-			tStart = arrGroup[0][1]-idDelayRecognition.value/1000;
-			tEnd  = arrGroup.slice(-1)[0][2]-idDelayRecognition.value/1000;
-			text = "<i>" + text + "</i>"
-			cueVtt.line = 0;
-		}
-		if(i>0 && transcriptGroupFinal==0)
-		{
-			//remove text duplicate previous line 
-			text = findDifference(arrTranscript[i-1][3],text)
-		}
-		cueVtt.startTime=tStart;
-		cueVtt.endTime=tEnd;
-		cueVtt.text=text;
+function loadTranscriptToRawVTT() {
+    showingTrack(trackRaw);
+	let delay=idDelayRecognition.value / 1000 ;
+	idFilter.value != 2 && arrTranscript.forEach(  function (t,i){
+		let text=t[2];
+		let cueVtt = new VTTCue(t[0] - delay ,t[1] - delay,text);
 		trackRaw.addCue(cueVtt);
-	  }
-}
-function findDifference(str1, str2){ 
-  let pos= 0;
-  str2.split('').some( (val,i) =>{if(val != str1.charAt(i)){pos=i;return true}} )
-  return str2.substr(pos)
- } 
-function startStopRecognition()
-{
-	if (waitTerminate) return;
-	try
-	{
-		recognition.lang = idSelectDialect.value;
-		recognition.start();
-	}
-	catch(e)
-	{
-		idVideo.pause();
-		//add last transcript
-		clearTimeout(timerLast)
-		if(timeStartLast>0)
-		{
-			arrTranscript.push([groupLast,timeStartLast,timeEndLast,transcriptLast,0])
-			timeStartLast=-1;
-		}
-		recognition.stop();
-	}
-}
-function loadSrcVideo (files)
-{
-	if(files.length!=1) return;
-	idVideo.getAttribute('src') && URL.revokeObjectURL(idVideo.getAttribute('src'));
-	idVideo.setAttribute('src', URL.createObjectURL(files[0]));
-	idVideo.load();
-	nameVideo = files[0].name.removeExtension()
-}
-function loadSrcSubtitle(evt)
-{
-	if(evt.target.files.length!=1) return;
-	file = evt.target.files[0];
-	nameVideo=file.name.removeExtension();
-	contentS=["WEBVTT\r\n\r\n"]
-	fReader = new FileReader();	fReader.readAsText(file)
-	switch(file.name.toLowerCase().split('.').slice(-1)[0]){
-	case "srt":
-		fReader.onload= (e)=>setSrcSub( new Blob( contentS.concat( e.target.result.replace(/(\d\d:\d\d),(\d\d\d)/g, '$1.$2')) ));
-		break;
-	case "ass":
-		const fAss=/(\d+:\d\d:\d\d.\d\d),(\d+:\d\d:\d\d.\d\d),.*?,.*?,.*?,.*?,.*?,.*?,(.*)/g;
-		fReader.onload= (e)=>setSrcSub
-		( 
-			new Blob( e.target.result.replace( fAss,(a,tStart,tEnd,text)=>
-			contentS.push(`${tStart}0 --> ${tEnd}0\r\n${text}\r\n\r\n`)
-			) && contentS)
-		);
-	break;
-	default:
-		setSrcSub(file)
-	}
-	function setSrcSub(b)
-	{
-		idFileVTT.getAttribute('src') && URL.revokeObjectURL(idFileVTT.getAttribute('src'));
-		idFileVTT.setAttribute('src', URL.createObjectURL(b, {type: "text/plain"}) );
-		showingTrack(idVideo.textTracks.getTrackById("idFileVTT"))
-	}
-}
-
-var langs =[
-['English', ['en-AU', 'Australia'],['en-CA', 'Canada'],['en-IN', 'India'],['en-KE', 'Kenya'],['en-TZ', 'Tanzania'],['en-GH', 'Ghana'],['en-NZ', 'New Zealand'],['en-NG', 'Nigeria'],['en-ZA', 'South Africa'],['en-PH', 'Philippines'],['en-GB', 'United Kingdom'],['en-US', 'United States']],
-['Español/Spanish', ['es-AR', 'Argentina'],['es-BO', 'Bolivia'],['es-CL', 'Chile'],['es-CO', 'Colombia'],['es-CR', 'Costa Rica'],['es-EC', 'Ecuador'],['es-SV', 'El Salvador'],['es-ES', 'España'],['es-US', 'Estados Unidos'],['es-GT', 'Guatemala'],['es-HN', 'Honduras'],['es-MX', 'México'],['es-NI', 'Nicaragua'],['es-PA', 'Panamá'],['es-PY', 'Paraguay'],['es-PE', 'Perú'],['es-PR', 'Puerto Rico'],['es-DO', 'República Dominicana'],['es-UY', 'Uruguay'],['es-VE', 'Venezuela']],
-['中文/Chinese', ['cmn-Hans-CN', '普通话 (中国大陆)/Mandarin (Mainland China)'],['cmn-Hans-HK', '普通话 (香港)/Mandarin (Hong Kong)'],['cmn-Hant-TW', '中文 (台灣)/Chinese (Taiwan)'],['yue-Hant-HK', '粵語 (香港)/Cantonese (Hong Kong)']],
-['日本語/Japanese', ['ja-JP']],
-['한국어/Korean', ['ko-KR']],
-['Deutsch/German', ['de-DE']],
-['Français/French', ['fr-FR']],
-['Italiano/Italian',['it-IT', 'Italia'],['it-CH', 'Svizzera']],
-['Português/Portuguese',['pt-BR', 'Brasil'],['pt-PT', 'Portugal']],
-['Pусский/Esloven/Russian', ['ru-RU']],
-['Nederlands/Dutch', ['nl-NL']],
-['Català/Catalan', ['ca-ES']],
-['Čeština/Czech', ['cs-CZ']],
-['Polski/Polish', ['pl-PL']],
-['Filipino', ['fil-PH']],
-['Slovenčina', ['sk-SK']],
-['Suomi/Finland', ['fi-FI']],
-['Svenska/Swedish', ['sv-SE']],
-['Tiếng Việt/Vietnamese', ['vi-VN']],
-['Türkçe/Turkish', ['tr-TR']],
-['Română/Romanian', ['ro-RO']],
-['Українська/Ukrainian', ['uk-UA']],
-['हिन्दी/Hindi', ['hi-IN']],
-['Galego', ['gl-ES']],
-['Dansk', ['da-DK']],
-['Afrikaans', ['af-ZA']],
-['አማርኛ/Amárico', ['am-ET']],['Azərbaycanca', ['az-AZ']],['বাংলা/Bengali', ['bn-BD', 'বাংলাদেশ'],['bn-IN', 'ভারত']],['Bahasa Indonesia',['id-ID']],['Bahasa Melayu', ['ms-MY']],
-['Euskara/Basque', ['eu-ES']],['Basa Jawa/Javanese base',['jv-ID']],
-['ગુજરાતી/Gujarati', ['gu-IN']],['Hrvatski/Croatian',['hr-HR']],['IsiZulu', ['zu-ZA']],['Íslenska/Icelandic',['is-IS']],['ಕನ್ನಡ/Kannada', ['kn-IN']],
-['ភាសាខ្មែរ/Camboyan', ['km-KH']],['Latviešu/Latvian', ['lv-LV']],['Lietuvių/Lithuanian', ['lt-LT']],
-['മലയാളം/Malayalam', ['ml-IN']],['मराठी/Marathi', ['mr-IN']],['Magyar/Hungarian', ['hu-HU']],
-['ລາວ/Lao', ['lo-LA']],['नेपाली भाषा/Nepali', ['ne-NP']],['Norsk bokmål/Norwegian Bokmål', ['nb-NO']],
-['සිංහල/the Sinhala', ['si-LK']],['Slovenščina/Slovene', ['sl-SI']],['Basa Sunda/Sundanese', ['su-ID']],
-['Kiswahili', ['sw-TZ', 'Tanzania'],['sw-KE', 'Kenya']],['ქართული/Georgian', ['ka-GE']],['Հայերեն/Armenian', ['hy-AM']],
-['தமிழ்/Tamil', ['ta-IN', 'இந்தியா'],['ta-SG', 'சிங்கப்பூர்'],['ta-LK', 'இலங்கை'],['ta-MY', 'மலேசியா']],
-['తెలుగు/Telugu', ['te-IN']],['اُردُو/Sindhi', ['ur-PK', 'پاکستان'],['ur-IN', 'بھارت']],['Ελληνικά/Greek', ['el-GR']],['български/Bulgarian', ['bg-BG']],['Српски/Serbian', ['sr-RS']],
-['ภาษาไทย/Thailand', ['th-TH']]];
-for (var i = 0; i < langs.length; i++) {  idSelectLanguage.options[i] = new Option(langs[i][0], i);}
-idSelectLanguage.selectedIndex = INDEXLANGUAGE;idSelectDialect.selectedIndex = 0;
-function updateCountry() {
-  for (var i = idSelectDialect.options.length - 1; i >= 0; i--) {idSelectDialect.remove(i); }
-  var list = langs[idSelectLanguage.selectedIndex];
-  for (var i = 1; i < list.length; i++) {idSelectDialect.options.add(new Option(list[i][1], list[i][0]));}
-  idSelectDialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
-  languageName=langs[idSelectLanguage.value][0].replace(/\/.*/,"");
-  languageCode=idSelectDialect.value.replace(/-.*/,"");
-  idTranscript.innerText=languageName;
-  document.documentElement.lang=languageCode
-}
-function keyEvent(e)
-{
-	 //console.log(e)
-	 if (document.fullscreenElement)
-	 {
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==false && e.code=="KeyP") && (idVideo.paused?idVideo.play():idVideo.pause());
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==false && e.code=="KeyQ") && startStopRecognition();
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==false && e.code=="KeyM") && idVideo.currentTime++;
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==false && e.code=="KeyN") && idVideo.currentTime--;
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==true && e.code=="KeyM") && (idVideo.currentTime+=0.5);
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==true && e.code=="KeyN") && (idVideo.currentTime-=0.5);
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==false && e.key=="PageDown") && (idVideo.currentTime+=10);
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==false && e.key=="PageUp") && (idVideo.currentTime-=10);
-		(e.ctrlKey==false && e.altKey==true && e.shiftKey==false && e.key=="PageDown") && nextCue("NEXT");
-		(e.ctrlKey==false && e.altKey==true && e.shiftKey==false && e.key=="PageUp") && nextCue("PREV");
-		
-		if (e.ctrlKey==false && e.altKey==true && e.shiftKey==false && e.key=="+" ) for(let cue of aLastCueActive){cue.startTime+=0.1};
-		if (e.ctrlKey==false && e.altKey==true && e.shiftKey==false && e.key=="-" ) for(let cue of aLastCueActive){cue.startTime-=0.1};
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==false && e.key=="+") && ( lastCueActive && (lastCueActive.startTime+=0.1) );
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==false && e.key=="-") && ( lastCueActive && (lastCueActive.startTime-=0.1) );
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==true && e.key=="+") && ( lastCueActive && (lastCueActive.endTime+=0.1) );
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==true && e.key=="-") && ( lastCueActive && (lastCueActive.endTime-=0.1) );
-		
-		if (e.ctrlKey==true && e.altKey==false && e.shiftKey==false && e.code=="Delete") for(cues of currentTrack.activeCues){currentTrack.removeCue(cues)}
-		(e.ctrlKey==false && e.altKey==false && e.shiftKey==false && e.code=="Delete") && ( cueActive() && currentTrack.removeCue(cueActive()) );
-	 }
-
-	(e.ctrlKey==true && e.altKey==false && e.shiftKey==false && e.code=="KeyQ") && startStopRecognition();
-	(e.ctrlKey==true && e.altKey==true && e.shiftKey==false && e.code=="ArrowUp") && joinLines("PREV");
-	(e.ctrlKey==true && e.altKey==true && e.shiftKey==false && e.code=="ArrowDown") && joinLines("NEXT");
+	});
 	
-	function joinLines(sibling)
-	{
-		if (document.activeElement&&document.activeElement.parentNode.nodeName!="TR") return;
-		let nodeA= (sibling=="NEXT")?document.activeElement.parentNode:document.activeElement.parentNode.previousSibling;
-		let nodeB= (sibling=="NEXT")?document.activeElement.parentNode.nextSibling:document.activeElement.parentNode
-		if (nodeB.children[3].innerText||nodeA.children[3].innerText) return;//line:0;
-		nodeA.children[2].innerText=nodeB.children[2].innerText;
-		nodeA.children[5].innerText=nodeA.children[5].innerText + " " + nodeB.children[5].innerText;
-		idTable.deleteRow(nodeB.rowIndex)
-		nodeA.children[5].focus()
-	}
-}
-function cueActive()
-{
-	if(!currentTrack || !currentTrack.activeCues.length) return;
-	aLastCueActive=[];
-	for(let cue of currentTrack.activeCues)
-	{
-		aLastCueActive.push(cue)
-		if (cue.line=="auto") 
-			lastCueActive=cue;
-	}
-}
-idHelp.title=`
-‎Shortcuts
-Ctrl+Q: Start/Stop	 Recognition Speech
-Ctrl+alt+M: Join row previous in table
-Ctrl+alt+N: Join row next in table
+	idFilter.value !=1 && resultFinal.forEach(  function (t,i){
+		let cueVtt = new VTTCue(t[0] - delay,t[1] - delay,t[2]);
+		if (+idFilter.value == 0) cueVtt.line = 0;
+		trackRaw.addCue(cueVtt);
+	});
 
-‎SHORTCUTS ONLY FULL SCREEN
-Q: Start/Stop	 Recognition Speech
-P: Play/Stop video
-PageDown: Forward 10 seconds
-PageUp:	Rewind 10 seconds
+}
+function findDifference(str1, str2) {
+    let pos = 0;
+    str2.split('').some((val,i)=>{
+        if (val != str1.charAt(i)) {
+            pos = i;
+            return true;
+        }
+    }
+    )
+    return str2.substr(pos);
+}
+function startStopRecognition() {
+    if (waitTerminate || idVideo.src == "")
+        return;
+    try {
+        recognition.lang = idSelectDialect.value;
+        recognition.start();
+        cBusy();
+    } catch (e) {
+        idVideo.pause();
+        recognition.stop();
+    }
+}
+function loadSrcVideo(files) {
+    if (files.length != 1)	return;
+    idVideo.getAttribute('src') && URL.revokeObjectURL(idVideo.getAttribute('src'));
+    idVideo.setAttribute('src', URL.createObjectURL(files[0]));
+    idVideo.load();
+    nameVideo = files[0].name.removeExtension()
+}
+function loadSrcSubtitle(files) {
+    if (files.length != 1)
+        return;
+    file = files[0];
+    nameVideo = file.name.removeExtension();
+    contentS = ["WEBVTT\r\n\r\n"];
+    fReader = new FileReader();
+    fReader.readAsText(file)
+    switch (file.name.toLowerCase().split('.').slice(-1)[0]) {
+    case "srt":
+        fReader.onload = (e)=>setSrcSub(new Blob(contentS.concat(e.target.result.replace(/(\d\d:\d\d),(\d\d\d)/g, '$1.$2'))));
+        break;
+    case "ass":
+        const fAss = /(\d+:\d\d:\d\d.\d\d),(\d+:\d\d:\d\d.\d\d),(.*?),.*?,.*?,.*?,.*?,.*?,(.*)/g;
+        fReader.onload = (e)=>setSrcSub(new Blob(e.target.result.replace(fAss, (a,tStart,tEnd,style,text)=>contentS.push(`${tStart}0 --> ${tEnd}0${style == "Top" && " line:0"}\r\n${text}\r\n\r\n`)) && contentS));
+        break;
+    default:
+        setSrcSub(file)
+    }
+    function setSrcSub(b) {
+        idFileVTT.getAttribute('src') && URL.revokeObjectURL(idFileVTT.getAttribute('src'));
+        idFileVTT.setAttribute('src', URL.createObjectURL(b, {type: "text/plain"}));
+        showingTrack(idVideo.textTracks.getTrackById("idFileVTT"));
+    }
+}
+
+var langs = [['English', ['en-AU', 'Australia'], ['en-CA', 'Canada'], ['en-IN', 'India'], ['en-KE', 'Kenya'], ['en-TZ', 'Tanzania'], ['en-GH', 'Ghana'], ['en-NZ', 'New Zealand'], ['en-NG', 'Nigeria'], ['en-ZA', 'South Africa'], ['en-PH', 'Philippines'], ['en-GB', 'United Kingdom'], ['en-US', 'United States']], ['Español/Spanish', ['es-AR', 'Argentina'], ['es-BO', 'Bolivia'], ['es-CL', 'Chile'], ['es-CO', 'Colombia'], ['es-CR', 'Costa Rica'], ['es-EC', 'Ecuador'], ['es-SV', 'El Salvador'], ['es-ES', 'España'], ['es-US', 'Estados Unidos'], ['es-GT', 'Guatemala'], ['es-HN', 'Honduras'], ['es-MX', 'México'], ['es-NI', 'Nicaragua'], ['es-PA', 'Panamá'], ['es-PY', 'Paraguay'], ['es-PE', 'Perú'], ['es-PR', 'Puerto Rico'], ['es-DO', 'República Dominicana'], ['es-UY', 'Uruguay'], ['es-VE', 'Venezuela']], ['中文/Chinese', ['cmn-Hans-CN', '普通话 (中国大陆)/Mandarin (Mainland China)'], ['cmn-Hans-HK', '普通话 (香港)/Mandarin (Hong Kong)'], ['cmn-Hant-TW', '中文 (台灣)/Chinese (Taiwan)'], ['yue-Hant-HK', '粵語 (香港)/Cantonese (Hong Kong)']], ['日本語/Japanese', ['ja-JP']], ['한국어/Korean', ['ko-KR']], ['Deutsch/German', ['de-DE']], ['Français/French', ['fr-FR']], ['Italiano/Italian', ['it-IT', 'Italia'], ['it-CH', 'Svizzera']], ['Português/Portuguese', ['pt-BR', 'Brasil'], ['pt-PT', 'Portugal']], ['Pусский/Esloven/Russian', ['ru-RU']], ['Nederlands/Dutch', ['nl-NL']], ['Català/Catalan', ['ca-ES']], ['Čeština/Czech', ['cs-CZ']], ['Polski/Polish', ['pl-PL']], ['Filipino', ['fil-PH']], ['Slovenčina', ['sk-SK']], ['Suomi/Finland', ['fi-FI']], ['Svenska/Swedish', ['sv-SE']], ['Tiếng Việt/Vietnamese', ['vi-VN']], ['Türkçe/Turkish', ['tr-TR']], ['Română/Romanian', ['ro-RO']], ['Українська/Ukrainian', ['uk-UA']], ['हिन्दी/Hindi', ['hi-IN']], ['Galego', ['gl-ES']], ['Dansk', ['da-DK']], ['Afrikaans', ['af-ZA']], ['አማርኛ/Amárico', ['am-ET']], ['Azərbaycanca', ['az-AZ']], ['বাংলা/Bengali', ['bn-BD', 'বাংলাদেশ'], ['bn-IN', 'ভারত']], ['Bahasa Indonesia', ['id-ID']], ['Bahasa Melayu', ['ms-MY']], ['Euskara/Basque', ['eu-ES']], ['Basa Jawa/Javanese base', ['jv-ID']], ['ગુજરાતી/Gujarati', ['gu-IN']], ['Hrvatski/Croatian', ['hr-HR']], ['IsiZulu', ['zu-ZA']], ['Íslenska/Icelandic', ['is-IS']], ['ಕನ್ನಡ/Kannada', ['kn-IN']], ['ភាសាខ្មែរ/Camboyan', ['km-KH']], ['Latviešu/Latvian', ['lv-LV']], ['Lietuvių/Lithuanian', ['lt-LT']], ['മലയാളം/Malayalam', ['ml-IN']], ['मराठी/Marathi', ['mr-IN']], ['Magyar/Hungarian', ['hu-HU']], ['ລາວ/Lao', ['lo-LA']], ['नेपाली भाषा/Nepali', ['ne-NP']], ['Norsk bokmål/Norwegian Bokmål', ['nb-NO']], ['සිංහල/the Sinhala', ['si-LK']], ['Slovenščina/Slovene', ['sl-SI']], ['Basa Sunda/Sundanese', ['su-ID']], ['Kiswahili', ['sw-TZ', 'Tanzania'], ['sw-KE', 'Kenya']], ['ქართული/Georgian', ['ka-GE']], ['Հայերեն/Armenian', ['hy-AM']], ['தமிழ்/Tamil', ['ta-IN', 'இந்தியா'], ['ta-SG', 'சிங்கப்பூர்'], ['ta-LK', 'இலங்கை'], ['ta-MY', 'மலேசியா']], ['తెలుగు/Telugu', ['te-IN']], ['اُردُو/Sindhi', ['ur-PK', 'پاکستان'], ['ur-IN', 'بھارت']], ['Ελληνικά/Greek', ['el-GR']], ['български/Bulgarian', ['bg-BG']], ['Српски/Serbian', ['sr-RS']], ['ภาษาไทย/Thailand', ['th-TH']]];
+for (var i = 0; i < langs.length; i++) {
+    idSelectLanguage.options[i] = new Option(langs[i][0],i);
+}
+idSelectLanguage.selectedIndex = INDEXLANGUAGE;
+idSelectDialect.selectedIndex = 0;
+function updateCountry() {
+    for (var i = idSelectDialect.options.length - 1; i >= 0; i--) {
+        idSelectDialect.remove(i);
+    }
+    var list = langs[idSelectLanguage.selectedIndex];
+    for (var i = 1; i < list.length; i++) {
+        idSelectDialect.options.add(new Option(list[i][1],list[i][0]));
+    }
+    idSelectDialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
+    languageName = langs[idSelectLanguage.value][0].replace(/\/.*/, "");
+    languageCode = idSelectDialect.value.replace(/-.*/, "");
+    idTranscript.innerText = languageName;
+	idCPS.value=["日本語/Japanese","한국어/Korean","中文/Chinese"].includes(idSelectLanguage.options[idSelectLanguage.selectedIndex].text)?6:10;
+	textButtonFixTime();
+}
+function keyEvent(e) {
+    if (document.activeElement == idVideo || document.fullscreenElement ) 
+	{
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.code == "KeyP" && !e.repeat) && (idVideo.paused ? idVideo.play() : idVideo.pause());
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.code == "KeyQ" && !e.repeat) && startStopRecognition();
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.code == "KeyM") && idVideo.currentTime++;
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.code == "KeyN") && idVideo.currentTime--;
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == true && e.code == "KeyM") && (idVideo.currentTime += 0.5);
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == true && e.code == "KeyN") && (idVideo.currentTime -= 0.5);
+
+        (e.ctrlKey == false && e.altKey == true && e.shiftKey == false && e.key == "ArrowDown") && (idVideo.currentTime -= 5);
+        (e.ctrlKey == false && e.altKey == true && e.shiftKey == false && e.key == "ArrowUp") && (idVideo.currentTime += 5);
+        (e.ctrlKey == true && e.altKey == false && e.shiftKey == false && e.key == "ArrowDown") && (idVideo.currentTime -= 10);
+        (e.ctrlKey == true && e.altKey == false && e.shiftKey == false && e.key == "ArrowUp") && (idVideo.currentTime += 10);
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.key == "PageDown") && nextCue("NEXT");
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.key == "PageUp") && nextCue("PREV");
+
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.code == "KeyT") && cueNearFixTimeStartEnd(0); //Fix startTime for Next Cue
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.code == "KeyU") && cueNearFixTimeStartEnd(1); //Fix endTime for Previous Cue
+        if (e.ctrlKey == false && e.altKey == true && e.shiftKey == false && e.key == "+")  for (let cue of aLastCueActive) {cue.startTime += 0.1};
+		if (e.ctrlKey == false && e.altKey == true && e.shiftKey == false && e.key == "-")  for (let cue of aLastCueActive) {cue.startTime -= 0.1};
+		(e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.key == "+") && (lastCueActive && (lastCueActive.startTime += 0.1));
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.key == "-") && (lastCueActive && (lastCueActive.startTime -= 0.1));
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == true && e.key == "+") && (lastCueActive && (lastCueActive.endTime += 0.1));
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == true && e.key == "-") && (lastCueActive && (lastCueActive.endTime -= 0.1));
+        if (e.ctrlKey == true && e.altKey == false && e.shiftKey == false && e.code == "Delete")for (cues of currentTrack.activeCues) {currentTrack.removeCue(cues)}
+        (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.code == "Delete") && (cueActives() && removeCueCurrentTrack(lastCueActive));
+    }
+
+    (e.ctrlKey == true && e.altKey == false && e.shiftKey == false && e.code == "KeyQ" && !e.repeat) && startStopRecognition();
+    (e.ctrlKey == true && e.altKey == true && e.shiftKey == false && e.code == "KeyJ") && splitLine(e);
+    (e.ctrlKey == true && e.altKey == true && e.shiftKey == false && e.code == "ArrowUp") && joinLines("PREV");
+    (e.ctrlKey == true && e.altKey == true && e.shiftKey == false && e.code == "ArrowDown") && joinLines("NEXT");
+    (e.ctrlKey == false && e.altKey == true && e.shiftKey == false && e.key == "PageDown") && nextCue("NEXT");
+    (e.ctrlKey == false && e.altKey == true && e.shiftKey == false && e.key == "PageUp") && nextCue("PREV");
+	
+    function joinLines(sibling) {
+        if (document.activeElement && document.activeElement.parentNode.nodeName != "TR") return;
+        let nodeA = (sibling == "NEXT") ? document.activeElement.parentNode : document.activeElement.parentNode.previousSibling;
+        let nodeB = (sibling == "NEXT") ? document.activeElement.parentNode.nextSibling : document.activeElement.parentNode;
+        if (!nodeB || !nodeA) return;
+        if (nodeB.children[3].innerText || nodeA.children[3].innerText) return;
+
+        nodeA.children[2].innerText = nodeB.children[2].innerText;
+        nodeA.children[5].innerText = nodeA.children[5].innerText + " " + nodeB.children[5].innerText;
+        idTable.deleteRow(nodeB.rowIndex);
+        nodeA.children[5].focus();
+    }
+}
+
+function newSubtitle(e) {
+    if (!currentTrack || e.repeat || !(e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.code == "KeyC"))    return;
+    
+	if (e.type == "keydown") {
+        idVideo.play();
+        cueVttNS = new VTTCue(0,idVideo.duration,"My New Line Subtitle");
+        currentTrack.addCue(cueVttNS);
+        tstartCue = idVideo.currentTime;
+    } else {
+        cueVttNS.startTime = tstartCue;
+        cueVttNS.endTime = idVideo.currentTime - .001;
+        //currentTime different time actual, or cue forever showing
+        cueVttNS.text = "";
+        VTTtoTable(currentTrack);
+
+    }
+
+}
+
+function splitLine(e) {
+    if (e.target.name != "transcription")  return;
+    let cells = e.target.parentNode.children;
+    let tStart = cells[1].textContent.toSeconds();
+    let tEnd = cells[2].textContent.toSeconds();
+    let r = window.getSelection().getRangeAt(0);
+    let text = r.startContainer.textContent.split("");
+    let cpt = (tEnd - tStart) / text.length;
+    endOffset = r.startOffset == r.endOffset ? text.length : r.endOffset;
+    textExtracted = text.splice(r.startOffset, endOffset - r.startOffset).join("");
+    tBoth = (tStart + (text.length * cpt));
+    cells[2].textContent = tBoth.toTime();
+    cells[5].textContent = text.join("");
+    rowTable(tBoth + .001, tEnd, cells[3].textContent, textExtracted, cells[1].parentNode.rowIndex);
+}
+function addRemMiliseconds(e) {
+    (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.key == "+") && (e.target.textContent = (e.target.textContent.toSeconds() + 0.1).toTime());
+    (e.ctrlKey == false && e.altKey == false && e.shiftKey == false && e.key == "-") && (e.target.textContent = (e.target.textContent.toSeconds() - 0.1).toTime());
+    if (isNaN(String.fromCharCode(e.which)))  e.preventDefault();
+
+    colorCells(e.target);
+    idVideo.currentTime = e.target.textContent.toSeconds();
+
+}
+function removeCueCurrentTrack(cue) {
+    let listCues = listCuesCurrentTrackFilter();
+    if (listCues) {
+        index = listCues.indexOf(cue);
+        lastCueActive = index >= 1 ? listCues[index - 1] : undefined;
+    }
+    currentTrack.removeCue(cue);
+}
+
+function cueActives() {
+    if (!currentTrack || currentTrack.label == "RealTime" || !currentTrack.activeCues.length)	return false;
+    aLastCueActive = [];
+    for (let cue of currentTrack.activeCues) {
+        aLastCueActive.push(cue);
+        if (cue.line == "auto")
+            lastCueActive = cue;
+        else if (currentTrack.activeCues.length == 1)
+            lastCueActive = cue;
+    }
+    return true;
+}
+
+function cueNearFixTimeStartEnd(iPrev) // 1 Previous Fix endTime ,   0 Next Fix startTime
+{
+    let i = 0, cueSelected = undefined;
+    if (currentTrack.activeCues && currentTrack.activeCues.length == 0) {
+        for (cue of currentTrack.cues) {
+            if (cue.startTime >= idVideo.currentTime)
+                break;
+            i++;
+        }
+        cueSelected = currentTrack.cues[i - iPrev];
+    } else cueSelected = currentTrack.activeCues[0];
+    
+    if (!cueSelected)  return;
+
+    if (iPrev)
+        cueSelected.endTime = idVideo.currentTime;
+    else
+        cueSelected.startTime = idVideo.currentTime;
+
+}
+
+idHelp.title = `
+‎Shortcuts General
+Ctrl+Q: Start/Stop	 Recognition Speech
 alt + PageDown: Next cue
 alt + PageUp:	Previous cue
+
+‎SHORTCUTS IN TABLE
+Ctrl+alt+ArrowUp: Join row previous
+Ctrl+alt+ArrowDown: Join row next
+Ctrl+alt+J: Split row in cursor or selection
+SHORTCUTS IN CELLS TIME 
+- add 100 ms to start time
++ rest 100 ms to start time
+
+‎SHORTCUTS IN VIDEO
+Q: Start/Stop	 Recognition Speech
+P: Play/Stop video
+C: Hold down the key C, create a new subtitle line empty
+Alt + ArrowUp: Forward 5 seconds
+Alt + ArrowDown:	Rewind 5 seconds
+Ctrl + ArrowUp: Forward 10 seconds
+Ctrl + ArrowDown:	Rewind 10 seconds
+PageDown: Next cue
+PageUp:	Previous cue
 M: Forward 1 second
-Shift+M:  Forward 500 ms
+Shift + M:  Forward 500 ms
 N: Rewind 1 second
-Shift+N: Rewind 500 ms
+Shift + N: Rewind 500 ms
 Del: Delete cue(s) active
-Ctrl+Del: Delete all cue(s) active
-R: Start/Stop	Recognition Speech
-+: add 100 ms to StartTime of last cue active.
--: rest 100 ms to StartTime of last cue active.
-Alt + +: add 100 ms to StartTime of last cue active(All).
-Alt + -: rest 100 ms to StartTime of last cue active(All).
-ctrl + +: add 100 ms to EndTime of last cue active.
-ctrl + -: rest 100 ms to EndTime of last cue active.
+Ctrl + Del: Delete all cue(s) active
+
++: add 100 ms to start time of last cue active.
+-: rest 100 ms to star time of last cue active.
+Alt + +: add 100 ms to start time of last cue active(All).
+Alt + -: rest 100 ms to star time of last cue active(All).
+ctrl + +: add 100 ms to end time of last cue active.
+ctrl + -: rest 100 ms to end time of last cue active.
 `
-var headASS=`[Script Info]
+var headASS = `[Script Info]
 Title:
 WrapStyle: 0
 ScaledBorderAndShadow: yes
@@ -977,24 +1318,22 @@ Style: Top,Arial,35,&H00FFFFFF,&H00F6C8A5,&H00000000,&H00000000,0,-1,0,0,100,100
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 `;
 
-
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-if(SpeechRecognition)
-{
-	recognition = new SpeechRecognition();
-	recognition.maxAlternatives = 1;
-	recognition.continuous = true;
-	recognition.interimResults = true;
-	recognition.onstart = recognitionStart;
-	recognition.onerror = (e)=> {idTranscript.innerHTML="<b>Error: </b>" + e.error;idVideo.pause();};
-	recognition.onaudioend = recognitionTerminate;
-	recognition.onresult = recognitionResult;
-	updateCountry();
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.maxAlternatives = 1;
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.onstart = recognitionStart;
+    recognition.onerror = (e)=>{ idTranscript.innerHTML = "<b>Error: </b>" + e.error;idVideo.pause();};
+    recognition.onaudioend = recognitionTerminate;
+    recognition.onresult = recognitionResult;
+    updateCountry();
+} else {
+    idGroup2.style.visibility = "hidden";
+    idTranscript.innerHTML = "Your browser not support Web Speech API, use last version Chrome/Edge";
 }
-else
-{
-	idGroup2.style.visibility="hidden";	idTranscript.innerHTML="Your browser not support Web Speech API, use last version Chrome"
-}
-  </script>
+
+</script>  
 </body>
 </html>
