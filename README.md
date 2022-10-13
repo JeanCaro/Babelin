@@ -1,5 +1,5 @@
 # Babelin Speach
-It is a simple html file for voice recognition and real-time translation of files videos or audio, Use the services offered by web browsers(Chrome current).
+It is a simple html file for voice recognition and **real-time translation **of files videos or audio, Use the services offered by web browsers(Chrome/Edge current).
 It is possible to see the subtitles in real time (delay minus 1 second), in any video and in any language that the browser supports.
 
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/Q-7P6Xgqwb0/0.jpg)](http://www.youtube.com/watch?v=Q-7P6Xgqwb0)
@@ -16,6 +16,7 @@ It is possible to see the subtitles in real time (delay minus 1 second), in any 
 
 ### Requirements 📋
 * [Chrome browser (last version)](https://www.google.com/intl/en_us/chrome/).
+* [Edge browser (last version)](https://www.microsoft.com/en-us/edge/).
 
 * Your audio card must support the Mix Stereo option for recording.
 
@@ -37,7 +38,7 @@ It is possible to see the subtitles in real time (delay minus 1 second), in any 
 
 [V 1.0](https://github.com/JeanCaro/Babelin/releases).
 
-## Online
+##  Test online with the latest version 1.1
 
 * [Babelin Online](https://jeancaro.github.io/Babelin/BabelinSpeech.html)
 
@@ -54,8 +55,10 @@ It is possible to see the subtitles in real time (delay minus 1 second), in any 
 *CPS stands for "characters per second". It therefore measures the speed at which words appear in subtitles or captions. 
 
 # Recommendations
-* Use Edge/Microsoft performs better transcription and Chrome/Google for It better recognizes the start and end times of the voice, but its transcription is regular. .
-* There are two important CPSs, the source CPS and the destination CPS. For example, languages like Japanese, Korean, Chinese can have CPS of 4-6, while languages like English 8-12, or Spanish/Portugues of 10-14.
+* **Use Edge/Microsoft** performs **better transcription** and Chrome/Google for It better recognizes the start and end times of the voice, but its transcription is regular. 
+
+* There are two important CPSs, the source CPS and the destination CPS. For example, languages like Japanese, Korean, Chinese can have CPS of 4-6, while languages like English 8-12, or Portugues/Spanish of 10-14.
+
 * Once the whole transcription is finished, if colored lines appear, easily by pressing the "Fix Time Start (CPS)" button, correct the start times of the lines with short time problems.
 
 # Subtitles and CPS
