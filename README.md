@@ -60,5 +60,7 @@ It is possible to see the subtitles in real time (delay minus 1 second), in any 
 
 # Subtitles and CPS
 https://captiz.com/wp-content/themes/captiz/SubtitlingGuidelinesCaptiz.pdf
+
 https://partnerhelp.netflixstudios.com/hc/en-us/articles/215758617-Timed-Text-Style-Guide-General-Requirements
+
 https://www.authot.com/en/2022/02/10/synchronisation-of-subtitles/
